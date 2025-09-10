@@ -283,6 +283,10 @@ class ScrollMoon {
     }
 
     startAnimation() {
+        this.log('Starting animation loop...');
+        
+        let frameCount = 0;
+        
         const animate = () => {
             const now = Date.now();
             
@@ -297,14 +301,28 @@ class ScrollMoon {
                 // 速度減衰
                 this.scrollVelocity *= this.config.dampening;
                 
-                this.renderer.render(this.scene, this.camera);
+                // レンダリング
+                try {
+                    this.renderer.render(this.scene, this.camera);
+                    
+                    // 最初の数フレームをログ出力
+                    if (frameCount < 5) {
+                        this.log(`Frame ${frameCount} rendered successfully`);
+                    }
+                    
+                } catch (renderError) {
+                    this.log('ERROR during rendering:', renderError);
+                }
+                
                 this.lastFrameTime = now;
+                frameCount++;
             }
             
             requestAnimationFrame(animate);
         };
         
         animate();
+        this.log('Animation loop started');
     }
 
     handleResize() {
