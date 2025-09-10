@@ -7,8 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Literata:wght@400&family=Noticia+Text:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> 
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/loader.css">
+    <link rel="stylesheet" href="css/moon_3d.css">
 </head>
 <body>
     <!-- ローディングアニメーション -->
@@ -32,6 +37,14 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- 3D月コンテナ -->
+    <div class="moon-container" id="moonContainer"></div>
+
+    <!-- スクロールデバッグ表示（開発用） -->
+    <div class="scroll-debug" id="scrollDebug">
+        <div>回転: <span id="rotationSpeed">0</span></div>
     </div>
 
     <div class="main-content" id="mainContent"></div>
@@ -353,5 +366,6 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
     <script src="js/loader.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/moon_3d.js"></script>
 </body>
 </html>
