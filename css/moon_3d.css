@@ -1,0 +1,38 @@
+/* 3D月コンテナ */
+.moon-container {
+    position: fixed;
+    top: 50%;
+    left: 30%; /* 左寄りに配置 */
+    transform: translate(-50%, -50%);
+    width: 350px;
+    height: 350px;
+    pointer-events: none;
+    z-index: 50;
+    mix-blend-mode: multiply;
+    opacity: 0.4;
+}
+
+/* スクロールデバッグ表示（開発用） */
+.scroll-debug {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    z-index: 200;
+    font-size: 10px;
+    opacity: 0.7;
+    display: none; /* 本番では非表示 */
+}
+
+/* レスポンシブデザイン（3D関連） */
+@media (max-width: 767px) {
+    .moon-container {
+        width: 250px;
+        height: 250px;
+        left: 25%;
+    }
+}
