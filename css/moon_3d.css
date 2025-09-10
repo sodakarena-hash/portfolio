@@ -10,6 +10,16 @@
     z-index: 50;
     mix-blend-mode: multiply;
     opacity: 0.4;
+    /* デバッグ用 - 一時的に境界線を表示 */
+    border: 2px solid red;
+    background: rgba(255, 255, 0, 0.1);
+}
+
+/* Canvas要素のスタイル */
+.moon-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
 }
 
 /* スクロールデバッグ表示（開発用） */
@@ -25,7 +35,7 @@
     z-index: 200;
     font-size: 10px;
     opacity: 0.7;
-    display: none; /* 本番では非表示 */
+    display: block; /* デバッグ用に表示 */
 }
 
 /* レスポンシブデザイン（3D関連） */
