@@ -1,3 +1,4 @@
+/* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -15,6 +16,7 @@ body {
     overflow-x: hidden;
 }
 
+/* Header Navigation */
 .header {
     background: #181818;
     padding: 20px 0;
@@ -63,6 +65,7 @@ body {
     cursor: pointer;
 }
 
+/* Hero Section */
 .hero-section {
     min-height: 100vh;
     background: #ccc;
@@ -168,6 +171,7 @@ body {
     color: #181818;
 }
 
+/* Topic Banner */
 .topic-banner {
     background: rgba(0,0,0,0.8);
     color: white;
@@ -185,6 +189,7 @@ body {
     cursor: pointer;
 }
 
+/* About Section */
 .about-section {
     padding: 80px 20px;
     max-width: 1200px;
@@ -259,6 +264,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
+/* Menu Section */
 .menu-section {
     padding: 80px 20px;
     text-align: center;
@@ -286,6 +292,20 @@ body {
     gap: 30px;
     max-width: 1200px;
     margin: 0 auto 40px;
+}
+
+.menu-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #CD9469;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(205, 148, 105, 0.2);
 }
 
 .menu-card-image {
@@ -333,6 +353,7 @@ body {
     color: #CD9469;
 }
 
+/* Menu Popup */
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -433,6 +454,7 @@ body {
     flex-shrink: 0;
 }
 
+/* News Section */
 .news-section {
     background: linear-gradient(rgba(38,38,38,0.8), rgba(38,38,38,0.8)), #ccc;
     padding: 80px 20px;
@@ -547,6 +569,7 @@ body {
     line-height: 1.6;
 }
 
+/* Reservation Section */
 .reserve-section {
     padding: 80px 20px;
     text-align: center;
@@ -624,6 +647,7 @@ body {
     flex-shrink: 0;
 }
 
+/* Reservation Form */
 .form-box {
     background: white;
     border-radius: 8px;
@@ -702,6 +726,7 @@ body {
     background: #b8824a;
 }
 
+/* Info Section */
 .info-section {
     background: #F5F3EE;
     padding: 80px 20px;
@@ -787,6 +812,7 @@ body {
     border: 1px solid #CD9469;
 }
 
+/* Footer */
 .footer {
     background: #181818;
     color: white;
@@ -887,7 +913,18 @@ body {
     text-decoration: underline;
 }
 
+/* Responsive Design */
 @media (min-width: 768px) {
+    .header {
+    background: #181818;
+    padding: 35px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: background 0.3s ease;
+    }
+
     .hero-section {
         background-attachment: fixed;
     }
@@ -929,6 +966,16 @@ body {
 }
 
 @media (max-width: 767px) {
+    .header {
+    background: #181818;
+    padding: 35px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: background 0.3s ease;
+    }
+
     .hero-bg-desktop {
         display: none;
     }
@@ -947,7 +994,7 @@ body {
 
     .nav-items {
         position: fixed;
-        top: -100px;
+        top: -200px;
         left: 0;
         width: 100%;
         height: auto;
@@ -1033,6 +1080,16 @@ body {
 }
 
 @media (max-width: 480px) {
+    .header {
+    background: #181818;
+    padding: 35px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: background 0.3s ease;
+    }
+
     .nav-container {
         flex-direction: column;
         gap: 15px;
@@ -1065,6 +1122,7 @@ body {
     }
 }
 
+/* Animation Classes */
 .fade-in {
     opacity: 0;
     transform: translateY(30px);
@@ -1074,18 +1132,4 @@ body {
 .fade-in.visible {
     opacity: 1;
     transform: translateY(0);
-}d {
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #CD9469;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
 }
-
-.menu-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(205, 148, 105, 0.2);
-}
-
-.menu-car
