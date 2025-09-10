@@ -11,6 +11,28 @@
     <link rel="stylesheet" href="css/loader.css">
 </head>
 <body>
+    <!-- ローディングアニメーション -->
+    <div id="moon-loading-overlay">
+        <div class="moon-loading-container">
+            <div class="moon-animation-area" id="moonAnimationArea">
+            </div>
+            
+            <div>
+                <h1 class="loading-title">月明茶房</h1>
+                <p class="loading-subtitle">GETUMEI CAFE</p>
+                
+                <div class="loading-progress">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span class="loading-dots" id="loadingMessage">月明かりを集めています</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <header class="header">
             <nav class="nav-container">
