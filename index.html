@@ -17,6 +17,14 @@
     
 </head>
 <body>
+    <!-- 3D月コンテナ -->
+    <div class="moon-container" id="moonContainer"></div>
+
+    <!-- スクロールデバッグ表示（開発用） -->
+    <div class="scroll-debug" id="scrollDebug">
+        <div>回転: <span id="rotationSpeed">0</span></div>
+    </div>
+    
     <!-- ローディングアニメーション -->
     <div id="moon-loading-overlay">
         <div class="moon-loading-container">
@@ -38,14 +46,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- 3D月コンテナ -->
-    <div class="moon-container" id="moonContainer"></div>
-
-    <!-- スクロールデバッグ表示（開発用） -->
-    <div class="scroll-debug" id="scrollDebug">
-        <div>回転: <span id="rotationSpeed">0</span></div>
     </div>
 
     <div class="main-content" id="mainContent"></div>
