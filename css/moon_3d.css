@@ -1,4 +1,4 @@
-/* 3D月コンテナ（背景に配置） */
+/* 3D月コンテナ（完全背景配置） */
 .moon-container {
     position: fixed;
     top: 50%;
@@ -7,7 +7,7 @@
     width: 350px;
     height: 350px;
     pointer-events: none;
-    z-index: 1; /* 背景レイヤーに配置（テキストや画像の後ろ） */
+    z-index: -1; /* 完全に背景レイヤーに配置 */
     mix-blend-mode: multiply;
     opacity: 0.6;
 }

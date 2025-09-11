@@ -13,6 +13,8 @@
     align-items: center;
     transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
     font-family: 'Noto Serif JP', serif;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 #moon-loading-overlay.fade-out {
@@ -26,12 +28,15 @@
     flex-direction: column;
     align-items: center;
     gap: 60px;
+    width: 100%;
+    max-width: 500px;
 }
 
 .moon-animation-area {
     position: relative;
     width: 400px;
     height: 200px;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -189,14 +194,18 @@
 @media (max-width: 768px) {
     .moon-loading-container {
         gap: 40px;
-        padding: 0 20px;
+        max-width: 90%;
     }
     
     .moon-animation-area {
-        width: 320px;
+        width: 100%;
+        max-width: 320px;
         height: 160px;
-        /* flexboxで中央寄せを確実にする */
         margin: 0 auto;
+        /* 確実な中央寄せ */
+        left: 50%;
+        transform: translateX(-50%);
+        position: relative;
     }
     
     .moon {
@@ -218,17 +227,22 @@
 @media (max-width: 480px) {
     .moon-loading-container {
         gap: 30px;
-        padding: 0 15px;
+        max-width: 95%;
+        padding: 0 10px;
     }
     
     .moon-animation-area {
-        width: 280px;
+        width: 100%;
+        max-width: 280px;
         height: 140px;
-        /* より確実な中央寄せ */
         margin: 0 auto;
-        left: 50%;
-        transform: translateX(-50%);
+        /* 二重の中央寄せで確実に */
         position: relative;
+        left: 0;
+        transform: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     
     .loading-progress {
