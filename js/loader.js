@@ -25,84 +25,106 @@ class MoonLoader {
     }
 
     start() {
-        this.createMoons();
+        // 少し遅延させてからDOMの準備を確実にする
+        setTimeout(() => {
+            this.createMoons();
+        }, 100);
+        
         setTimeout(() => {
             this.runLoading();
         }, 2000);
     }
 
     createMoons() {
-        // 動的にアニメーションエリアのサイズを取得
-        const areaRect = this.animationArea.getBoundingClientRect();
-        const areaWidth = this.animationArea.offsetWidth;
-        const areaHeight = this.animationArea.offsetHeight;
+        // 画面サイズ判定（window.innerWidthで確実に判定）
+        const screenWidth = window.innerWidth;
+        let config;
         
-        console.log(`アニメーションエリア: ${areaWidth}x${areaHeight}`);
+        if (screenWidth <= 360) {
+            config = { width: 240, height: 120, moonSize: 20, radius: 60 };
+        } else if (screenWidth <= 480) {
+            config = { width: 280, height: 140, moonSize: 25, radius: 70 };
+        } else if (screenWidth <= 768) {
+            config = { width: 320, height: 160, moonSize: 25, radius: 80 };
+        } else {
+            config = { width: 400, height: 200, moonSize: 30, radius: 100 };
+        }
         
-        // 円弧の設定（動的中央計算）
-        const moonCount = 7;
-        const startAngle = -157;
-        const endAngle = -20;
+        console.log(`画面: ${screenWidth}px → 設定:`, config);
         
-        // 画面サイズに応じて半径を調整
-        const radius = Math.min(areaWidth * 0.3, 120);
+        // アニメーションエリアのサイズを強制設定
+        this.animationArea.style.width = config.width + 'px';
+        this.animationArea.style.height = config.height + 'px';
         
-        // アニメーションエリアの中央座標（動的計算）
-        const areaCenterX = areaWidth / 2;
-        const areaCenterY = areaHeight / 2;
+        // 中央座標（エリアの中心）
+        const centerX = config.width / 2;
+        const centerY = config.height / 2;
         
-        console.log(`中央座標: (${areaCenterX}, ${areaCenterY}), 半径: ${radius}`);
-        
-        // 角度計算
-        const angleRange = endAngle - startAngle;
-        const angleStep = angleRange / (moonCount - 1);
-        
-        // 4番目の月（インデックス3）の角度
-        const fourthMoonAngle = startAngle + (3 * angleStep);
-        const fourthMoonAngleRad = (fourthMoonAngle * Math.PI) / 180;
-        
-        // 4番目の月が中央に来るように円弧の中心を逆算
-        const arcCenterX = areaCenterX - radius * Math.cos(fourthMoonAngleRad);
-        const arcCenterY = areaCenterY - radius * Math.sin(fourthMoonAngleRad);
-
-        // 月相設定：左から段階的に満月へ（中央は半月）
-        const phases = [
-            'new-moon',        // 1. 新月（一番左）
-            'thin-crescent',   // 2. 細い三日月
-            'crescent',        // 3. 三日月  
-            'quarter',         // 4. 半月（中央に配置）
-            'waxing-gibbous',  // 5. 満ちゆく月（少し）
-            'gibbous',         // 6. 満ちゆく月（多め）
-            'full'             // 7. 満月（一番右）
+        // 月の配置座標（手動で確実に計算）
+        const moonPositions = [
+            { x: centerX - config.radius * 0.8, y: centerY - config.radius * 0.4 },  // 左端
+            { x: centerX - config.radius * 0.5, y: centerY - config.radius * 0.6 },  // 左上
+            { x: centerX - config.radius * 0.2, y: centerY - config.radius * 0.7 },  // 中央左
+            { x: centerX, y: centerY },                                               // 中央（半月）
+            { x: centerX + config.radius * 0.2, y: centerY - config.radius * 0.7 },  // 中央右
+            { x: centerX + config.radius * 0.5, y: centerY - config.radius * 0.6 },  // 右上
+            { x: centerX + config.radius * 0.8, y: centerY - config.radius * 0.4 }   // 右端
         ];
 
+        // 月相設定
+        const phases = [
+            'new-moon', 'thin-crescent', 'crescent', 'quarter',
+            'waxing-gibbous', 'gibbous', 'full'
+        ];
+
+        // 既存の月をクリア
         this.animationArea.innerHTML = '';
         this.moons = [];
 
-        for (let i = 0; i < moonCount; i++) {
-            const angle = startAngle + (angleStep * i);
-            const angleRad = (angle * Math.PI) / 180;
-
-            const x = arcCenterX + radius * Math.cos(angleRad);
-            const y = arcCenterY + radius * Math.sin(angleRad);
-
+        // 月を作成
+        moonPositions.forEach((pos, i) => {
             const moon = document.createElement('div');
             moon.className = `moon ${phases[i]}`;
-            moon.style.left = `${x}px`;
-            moon.style.top = `${y}px`;
+            
+            // スタイルを直接設定
+            moon.style.cssText = `
+                position: absolute;
+                left: ${pos.x}px;
+                top: ${pos.y}px;
+                width: ${config.moonSize}px;
+                height: ${config.moonSize}px;
+                border-radius: 50%;
+                background: white;
+                overflow: hidden;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+                transform: translate(-50%, -50%);
+                transition: all 0.8s ease;
+                z-index: 1;
+            `;
 
             const shadow = document.createElement('div');
             shadow.className = 'moon-shadow';
+            shadow.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: ${config.moonSize}px;
+                height: ${config.moonSize}px;
+                background: #000000;
+                border-radius: 50%;
+                transition: transform 0.3s ease;
+            `;
+            
             moon.appendChild(shadow);
 
-            moon.dataset.originalX = x;
-            moon.dataset.originalY = y;
+            moon.dataset.originalX = pos.x;
+            moon.dataset.originalY = pos.y;
 
             this.animationArea.appendChild(moon);
             this.moons.push(moon);
             
-            console.log(`月${i+1}: (${x.toFixed(1)}, ${y.toFixed(1)})`);
-        }
+            console.log(`月${i+1} (${phases[i]}): (${pos.x}, ${pos.y})`);
+        });
     }
 
     runLoading() {
@@ -168,6 +190,7 @@ class MoonLoader {
 
     async mergeMoons(fromMoon, toMoon) {
         fromMoon.classList.add('moving');
+        fromMoon.style.boxShadow = '0 0 20px rgba(205, 148, 105, 0.6)';
         toMoon.style.opacity = '1';
 
         const toX = parseFloat(toMoon.dataset.originalX);
@@ -178,9 +201,16 @@ class MoonLoader {
 
         await this.wait(this.animationSpeed);
 
-        fromMoon.classList.add('absorbed');
-        fromMoon.classList.remove('moving');
-        toMoon.classList.add('enhanced');
+        // 吸収アニメーション
+        fromMoon.style.opacity = '0';
+        fromMoon.style.transform = 'translate(-50%, -50%) scale(0.1)';
+        
+        // エンハンス効果
+        toMoon.style.boxShadow = `
+            0 0 15px rgba(255, 255, 255, 0.5),
+            0 0 30px rgba(205, 148, 105, 0.3)
+        `;
+        toMoon.style.transform = 'translate(-50%, -50%) scale(1.1)';
 
         await this.wait(this.animationSpeed * 0.3);
 
@@ -188,7 +218,10 @@ class MoonLoader {
             fromMoon.parentNode.removeChild(fromMoon);
         }
 
-        toMoon.classList.remove('enhanced');
+        // エンハンス効果を戻す
+        toMoon.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.3)';
+        toMoon.style.transform = 'translate(-50%, -50%) scale(1)';
+        
         await this.wait(this.animationSpeed * 0.2);
     }
 
@@ -213,7 +246,6 @@ class MoonLoader {
         
         setTimeout(() => {
             this.mainContent.classList.add('loaded');
-            // メインサイトの初期化は main.js で行う
             if (typeof initMainSite === 'function') {
                 initMainSite();
             }
