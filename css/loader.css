@@ -206,7 +206,7 @@
         /* より強力な中央寄せ */
         margin: 0 auto;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translateX(-95%);
     }
     
     .moon {
@@ -245,7 +245,7 @@
         /* 三重の中央寄せ */
         margin: 0 auto;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translateX(-95%);
         position: relative;
         
         /* flexboxでも中央寄せ */
