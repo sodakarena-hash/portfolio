@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <div class="main-content" id="mainContent"></div>
+    <div class="main-content" id="mainContent">
         <div class="container">
             <header class="header">
                 <nav class="nav-container">
@@ -81,7 +81,7 @@
             <section class="about-section fade-in">
                 <div class="about-content">
                     <h2 class="about-title">
-                        月明かりの下、
+                        月明かりの下で、
                         <span class="about-title-large">時を忘れる静謐な喫茶。</span>
                     </h2>
                     <div class="about-line"></div>
@@ -327,7 +327,7 @@
                             <h2 class="footer-logo">月明茶房</h2>
                             <p class="footer-logo-subtitle">GETUMEI CAFE</p>
                             <p class="footer-description">
-                                月明かりの下、時を忘れる静謐な喫茶。日常の喧騒から離れた、あなただけの隠れ家で心ゆくまで安らぎのひとときをお過ごしください。
+                                月明かりの下で、時を忘れる静謐な喫茶。日常の喧騒から離れた、あなただけの隠れ家で心ゆくまで安らぎのひとときをお過ごしください。
                             </p>
                         </div>
                         
@@ -367,9 +367,17 @@
         </div>
     </div>
     
-    <script src="js/script.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
-    <script src="js/loader.js"></script>
+    <!-- 重要: JSファイルの読み込み順序を修正 -->
+    <!-- 1. まず3Dクラスを読み込み -->
     <script src="js/moon_3d.js"></script>
+    
+    <!-- 2. メインスクリプトを読み込み -->
+    <script src="js/script.js"></script>
+    
+    <!-- 3. 外部API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    
+    <!-- 4. 最後にローダーを読み込み（これがメインコンテンツを表示する） -->
+    <script src="js/loader.js"></script>
 </body>
 </html>
