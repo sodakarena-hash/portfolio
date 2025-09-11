@@ -9,10 +9,7 @@
     pointer-events: none;
     z-index: 50;
     mix-blend-mode: multiply;
-    opacity: 0.4;
-    /* デバッグ用 - 一時的に境界線を表示 */
-    border: 2px solid red;
-    background: rgba(255, 255, 0, 0.1);
+    opacity: 0.6;
 }
 
 /* Canvas要素のスタイル */
@@ -27,15 +24,18 @@
     position: fixed;
     top: 80px;
     right: 20px;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.8);
     color: white;
-    padding: 10px;
+    padding: 15px;
     border-radius: 5px;
     font-family: monospace;
     z-index: 200;
-    font-size: 10px;
-    opacity: 0.7;
-    display: block; /* デバッグ用に表示 */
+    font-size: 12px;
+    max-width: 200px;
+}
+
+.debug-line {
+    margin-bottom: 5px;
 }
 
 /* レスポンシブデザイン（3D関連） */
