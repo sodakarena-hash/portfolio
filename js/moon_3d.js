@@ -29,28 +29,18 @@ class ScrollMoon {
 
     init() {
         console.log('ScrollMoon初期化開始...');
-        if (typeof updateDebugStatus === 'function') {
-            updateDebugStatus('initStatus', '開始中...');
-        }
         
         this.container = document.getElementById('moonContainer');
         
         if (!this.container) {
-            this.logError('moonContainerが見つかりません');
+            console.error('moonContainerが見つかりません');
             return;
         }
 
         // Three.jsの確認
         if (typeof THREE === 'undefined') {
-            this.logError('Three.jsが読み込まれていません');
-            if (typeof updateDebugStatus === 'function') {
-                updateDebugStatus('threeStatus', '未読み込み');
-            }
+            console.error('Three.jsが読み込まれていません');
             return;
-        }
-        
-        if (typeof updateDebugStatus === 'function') {
-            updateDebugStatus('threeStatus', '読み込み済み');
         }
         
         try {
@@ -58,22 +48,12 @@ class ScrollMoon {
             this.setupScrollListener();
             this.startAnimation();
             this.isInitialized = true;
-            if (typeof updateDebugStatus === 'function') {
-                updateDebugStatus('initStatus', '完了');
-            }
             console.log('ScrollMoon初期化完了');
         } catch (error) {
-            this.logError('初期化エラー', error);
+            console.error('初期化エラー:', error);
         }
         
         return this;
-    }
-
-    logError(message, error) {
-        console.error(message, error);
-        if (typeof updateDebugStatus === 'function') {
-            updateDebugStatus('errorStatus', message);
-        }
     }
 
     createMoon() {
@@ -315,12 +295,6 @@ class ScrollMoon {
             
             this.lastScrollTop = scrollTop;
             lastScrollTime = now;
-            
-            // デバッグ表示更新
-            if (typeof updateDebugStatus === 'function') {
-                updateDebugStatus('rotationSpeed', (this.scrollVelocity * 0.01).toFixed(3));
-                updateDebugStatus('scrollPos', Math.round(scrollTop));
-            }
         };
         
         // スクロールイベント
@@ -370,7 +344,7 @@ class ScrollMoon {
                     }
                     
                 } catch (renderError) {
-                    this.logError('レンダリングエラー', renderError);
+                    console.error('レンダリングエラー:', renderError);
                 }
                 
                 this.lastFrameTime = now;

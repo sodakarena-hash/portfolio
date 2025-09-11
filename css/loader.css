@@ -32,6 +32,9 @@
     position: relative;
     width: 400px;
     height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* 月のスタイル */
@@ -184,9 +187,16 @@
 
 /* レスポンシブデザイン（ローディング部分） */
 @media (max-width: 768px) {
+    .moon-loading-container {
+        gap: 40px;
+        padding: 0 20px;
+    }
+    
     .moon-animation-area {
         width: 320px;
         height: 160px;
+        /* flexboxで中央寄せを確実にする */
+        margin: 0 auto;
     }
     
     .moon {
@@ -202,5 +212,27 @@
     .loading-progress {
         max-width: 300px;
         margin-top: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .moon-loading-container {
+        gap: 30px;
+        padding: 0 15px;
+    }
+    
+    .moon-animation-area {
+        width: 280px;
+        height: 140px;
+        /* より確実な中央寄せ */
+        margin: 0 auto;
+        left: 50%;
+        transform: translateX(-50%);
+        position: relative;
+    }
+    
+    .loading-progress {
+        max-width: 250px;
+        margin-top: 25px;
     }
 }

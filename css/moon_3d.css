@@ -1,4 +1,4 @@
-/* 3D月コンテナ */
+/* 3D月コンテナ（背景に配置） */
 .moon-container {
     position: fixed;
     top: 50%;
@@ -7,7 +7,7 @@
     width: 350px;
     height: 350px;
     pointer-events: none;
-    z-index: 50;
+    z-index: 1; /* 背景レイヤーに配置（テキストや画像の後ろ） */
     mix-blend-mode: multiply;
     opacity: 0.6;
 }
@@ -17,25 +17,6 @@
     width: 100% !important;
     height: 100% !important;
     display: block;
-}
-
-/* スクロールデバッグ表示（開発用） */
-.scroll-debug {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 15px;
-    border-radius: 5px;
-    font-family: monospace;
-    z-index: 200;
-    font-size: 12px;
-    max-width: 200px;
-}
-
-.debug-line {
-    margin-bottom: 5px;
 }
 
 /* レスポンシブデザイン（3D関連） */
