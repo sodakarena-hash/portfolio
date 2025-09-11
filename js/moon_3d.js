@@ -1,4 +1,4 @@
-// ScrollMoon 3Dムーンクラス
+// 線画表現の改良されたScrollMoon 3D月クラス
 class ScrollMoon {
     constructor() {
         this.scene = null;
@@ -17,13 +17,16 @@ class ScrollMoon {
         this.lastFrameTime = 0;
         this.isInitialized = false;
         
-        // 設定（よりゆっくりな回転）
+        // 設定（サイズを大きく、線画表現に最適化）
         this.config = {
             moonColor: '#2a2a2a',
-            scrollSensitivity: 0.002, // ゆっくり回転
+            craterColor: '#1a1a1a',
+            mariaColor: '#404040',
+            scrollSensitivity: 0.002,
             maxRotationSpeed: 0.05,
             dampening: 0.98,
-            minUpdateInterval: 16
+            minUpdateInterval: 16,
+            moonRadius: 2.0  // サイズを大きく
         };
     }
 
@@ -37,7 +40,6 @@ class ScrollMoon {
             return;
         }
 
-        // Three.jsの確認
         if (typeof THREE === 'undefined') {
             console.error('Three.jsが読み込まれていません');
             return;
@@ -57,7 +59,7 @@ class ScrollMoon {
     }
 
     createMoon() {
-        console.log('3D月作成開始...');
+        console.log('3D線画月作成開始...');
         
         // シーン作成
         this.scene = new THREE.Scene();
@@ -65,11 +67,9 @@ class ScrollMoon {
         const containerWidth = this.container.offsetWidth;
         const containerHeight = this.container.offsetHeight;
         
-        console.log(`コンテナサイズ: ${containerWidth}x${containerHeight}`);
-        
-        // カメラ作成
+        // カメラ作成（大きくなった月に合わせて調整）
         this.camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
-        this.camera.position.z = 2.8;
+        this.camera.position.z = 4.5;
         
         // レンダラー作成
         this.renderer = new THREE.WebGLRenderer({ 
@@ -82,55 +82,57 @@ class ScrollMoon {
         
         // DOMに追加
         this.container.appendChild(this.renderer.domElement);
-        console.log('Canvas要素をDOMに追加しました');
-        
-        // ライティング
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-        this.scene.add(ambientLight);
-        
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(1, 1, 1);
-        this.scene.add(directionalLight);
         
         // 月グループ
         this.moonGroup = new THREE.Group();
         this.scene.add(this.moonGroup);
         
-        // 月の詳細を作成
-        this.createDetailedMoon();
+        // 線画の月を作成
+        this.createWireframeMoon();
         
-        console.log('3D月作成完了');
+        console.log('3D線画月作成完了');
     }
 
-    createDetailedMoon() {
-        const moonRadius = 1.4;
+    createWireframeMoon() {
+        const moonRadius = this.config.moonRadius;
         
-        console.log('月の構造作成中...');
-        this.createSparseMoonStructure(moonRadius);
-        this.addImageBasedLines(moonRadius);
+        // より密な経線・緯線の基本構造
+        this.createEnhancedMoonStructure(moonRadius);
         
-        console.log(`月グループに${this.moonGroup.children.length}個のオブジェクトを追加`);
+        // 詳細なクレーターライン
+        this.addDetailedCraterLines(moonRadius);
+        
+        // 月の海（マリア）のライン
+        this.addMoonMariaLines(moonRadius);
+        
+        // 表面の微細なライン
+        this.addSurfaceDetailLines(moonRadius);
+        
+        console.log(`月グループに${this.moonGroup.children.length}個のラインオブジェクトを追加`);
     }
 
-    createSparseMoonStructure(moonRadius) {
-        const segments = 8; // 軽量化のため減らす
+    createEnhancedMoonStructure(moonRadius) {
+        const segments = 16; // より密な線
         
-        // 経線（縦の線）を部分的に描画
+        // 経線（縦の線）をより美しく
         for (let i = 0; i < segments; i++) {
             const phi = (i / segments) * Math.PI * 2;
             
+            // 連続した長い線と短い線を組み合わせ
             const lineSegments = [
-                { start: -0.8, end: -0.3 },
-                { start: 0.1, end: 0.6 },
-                { start: 0.8, end: 1.0 }
+                { start: -0.95, end: -0.6, opacity: 0.8 },
+                { start: -0.4, end: -0.1, opacity: 0.6 },
+                { start: 0.1, end: 0.4, opacity: 0.6 },
+                { start: 0.6, end: 0.95, opacity: 0.8 }
             ];
             
             lineSegments.forEach(segment => {
                 const segmentPoints = [];
-                for (let j = 0; j <= 6; j++) { // ポイント数を減らす
-                    const t = j / 6;
+                const steps = 12;
+                for (let j = 0; j <= steps; j++) {
+                    const t = j / steps;
                     const y = segment.start + (segment.end - segment.start) * t;
-                    const theta = Math.acos(Math.max(-1, Math.min(1, y))); // clamp
+                    const theta = Math.acos(Math.max(-1, Math.min(1, y)));
                     const radius = Math.sin(theta);
                     
                     const x = Math.cos(phi) * radius * moonRadius;
@@ -145,7 +147,7 @@ class ScrollMoon {
                     const lineMaterial = new THREE.LineBasicMaterial({ 
                         color: this.config.moonColor,
                         transparent: true,
-                        opacity: 0.8
+                        opacity: segment.opacity
                     });
                     const line = new THREE.Line(lineGeometry, lineMaterial);
                     this.moonGroup.add(line);
@@ -153,21 +155,22 @@ class ScrollMoon {
             });
         }
         
-        // 緯線（横の線）
-        const latitudes = [-0.6, -0.2, 0.2, 0.6];
-        latitudes.forEach(lat => {
+        // 緯線（横の線）をより詳細に
+        const latitudes = [-0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8];
+        latitudes.forEach((lat, index) => {
             const y = lat * moonRadius;
             const radius = Math.sqrt(Math.max(0, moonRadius * moonRadius - y * y));
             
-            const arcSegments = [
-                { start: 0, end: Math.PI * 0.4 },
-                { start: Math.PI * 0.7, end: Math.PI * 1.3 },
-                { start: Math.PI * 1.6, end: Math.PI * 2.0 }
+            // メインの緯線
+            const mainArcSegments = [
+                { start: 0, end: Math.PI * 0.6 },
+                { start: Math.PI * 0.8, end: Math.PI * 1.2 },
+                { start: Math.PI * 1.4, end: Math.PI * 2.0 }
             ];
             
-            arcSegments.forEach(segment => {
+            mainArcSegments.forEach(segment => {
                 const segmentPoints = [];
-                const steps = 8; // ステップ数を減らす
+                const steps = 16;
                 for (let i = 0; i <= steps; i++) {
                     const angle = segment.start + (segment.end - segment.start) * (i / steps);
                     segmentPoints.push(new THREE.Vector3(
@@ -178,10 +181,11 @@ class ScrollMoon {
                 }
                 
                 const lineGeometry = new THREE.BufferGeometry().setFromPoints(segmentPoints);
+                const opacity = Math.abs(lat) < 0.1 ? 0.9 : 0.7; // 赤道付近を強調
                 const lineMaterial = new THREE.LineBasicMaterial({ 
                     color: this.config.moonColor,
                     transparent: true,
-                    opacity: 0.6
+                    opacity: opacity
                 });
                 const line = new THREE.Line(lineGeometry, lineMaterial);
                 this.moonGroup.add(line);
@@ -189,89 +193,179 @@ class ScrollMoon {
         });
     }
 
-    addImageBasedLines(moonRadius) {
-        const linePatterns = [
-            {
-                center: new THREE.Vector3(0.2, 0.4, 0.9).normalize().multiplyScalar(moonRadius),
-                lines: [
-                    { angle: 0, length: 0.6, opacity: 0.9 },
-                    { angle: Math.PI/2, length: 0.5, opacity: 0.7 },
-                    { angle: Math.PI, length: 0.9, opacity: 0.9 }
+    addDetailedCraterLines(moonRadius) {
+        // より多くの様々なサイズのクレーター
+        const craters = [
+            // 大きなクレーター
+            { center: new THREE.Vector3(0.6, 0.4, 0.8), size: 0.2, detail: 20 },
+            { center: new THREE.Vector3(-0.5, 0.7, 0.6), size: 0.15, detail: 16 },
+            { center: new THREE.Vector3(0.8, -0.3, 0.7), size: 0.18, detail: 18 },
+            
+            // 中サイズのクレーター
+            { center: new THREE.Vector3(-0.7, -0.4, 0.8), size: 0.1, detail: 12 },
+            { center: new THREE.Vector3(0.3, 0.8, 0.5), size: 0.08, detail: 10 },
+            { center: new THREE.Vector3(-0.8, 0.2, 0.7), size: 0.09, detail: 12 },
+            
+            // 小さなクレーター
+            { center: new THREE.Vector3(0.9, -0.1, 0.5), size: 0.05, detail: 8 },
+            { center: new THREE.Vector3(-0.6, -0.7, 0.6), size: 0.04, detail: 8 },
+            { center: new THREE.Vector3(0.4, 0.6, 0.9), size: 0.06, detail: 8 },
+            { center: new THREE.Vector3(-0.3, 0.9, 0.4), size: 0.03, detail: 6 }
+        ];
+        
+        craters.forEach(crater => {
+            this.createCraterLines(crater.center, crater.size, crater.detail, moonRadius);
+        });
+    }
+
+    createCraterLines(center, size, detail, moonRadius) {
+        const normalizedCenter = center.clone().normalize().multiplyScalar(moonRadius);
+        
+        // クレーターの外縁
+        const rimPoints = [];
+        for (let i = 0; i <= detail; i++) {
+            const angle = (i / detail) * Math.PI * 2;
+            const localPoint = new THREE.Vector3(
+                Math.cos(angle) * size,
+                Math.sin(angle) * size,
+                0
+            );
+            
+            // 球面に投影
+            const craterNormal = normalizedCenter.clone().normalize();
+            const quaternion = new THREE.Quaternion().setFromUnitVectors(
+                new THREE.Vector3(0, 0, 1),
+                craterNormal
+            );
+            localPoint.applyQuaternion(quaternion);
+            
+            rimPoints.push(normalizedCenter.clone().add(localPoint));
+        }
+        
+        const rimGeometry = new THREE.BufferGeometry().setFromPoints(rimPoints);
+        const rimMaterial = new THREE.LineBasicMaterial({ 
+            color: this.config.craterColor,
+            transparent: true,
+            opacity: 0.8
+        });
+        const rimLine = new THREE.LineLoop(rimGeometry, rimMaterial);
+        this.moonGroup.add(rimLine);
+        
+        // クレーターの内部構造（放射状の線）
+        const radialLines = Math.max(4, Math.floor(detail / 3));
+        for (let i = 0; i < radialLines; i++) {
+            const angle = (i / radialLines) * Math.PI * 2;
+            const direction = new THREE.Vector3(
+                Math.cos(angle),
+                Math.sin(angle),
+                0
+            );
+            
+            const craterNormal = normalizedCenter.clone().normalize();
+            const quaternion = new THREE.Quaternion().setFromUnitVectors(
+                new THREE.Vector3(0, 0, 1),
+                craterNormal
+            );
+            direction.applyQuaternion(quaternion);
+            
+            const linePoints = [
+                normalizedCenter.clone(),
+                normalizedCenter.clone().add(direction.clone().multiplyScalar(size * 0.8))
+            ];
+            
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+            const lineMaterial = new THREE.LineBasicMaterial({ 
+                color: this.config.craterColor,
+                transparent: true,
+                opacity: 0.6
+            });
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            this.moonGroup.add(line);
+        }
+    }
+
+    addMoonMariaLines(moonRadius) {
+        // 月の海（マリア）の境界線
+        const maria = [
+            { center: new THREE.Vector3(0.2, 0.6, 0.9), size: 0.3, complexity: 24 },
+            { center: new THREE.Vector3(-0.6, -0.2, 0.8), size: 0.25, complexity: 20 },
+            { center: new THREE.Vector3(0.7, -0.6, 0.5), size: 0.2, complexity: 16 }
+        ];
+        
+        maria.forEach(mare => {
+            this.createMariaLines(mare.center, mare.size, mare.complexity, moonRadius);
+        });
+    }
+
+    createMariaLines(center, size, complexity, moonRadius) {
+        const normalizedCenter = center.clone().normalize().multiplyScalar(moonRadius);
+        
+        // 不規則な境界線を作成
+        const boundaryPoints = [];
+        for (let i = 0; i <= complexity; i++) {
+            const angle = (i / complexity) * Math.PI * 2;
+            const radiusVariation = 0.8 + Math.random() * 0.4; // ランダムな変化
+            const currentSize = size * radiusVariation;
+            
+            const localPoint = new THREE.Vector3(
+                Math.cos(angle) * currentSize,
+                Math.sin(angle) * currentSize,
+                0
+            );
+            
+            const mareNormal = normalizedCenter.clone().normalize();
+            const quaternion = new THREE.Quaternion().setFromUnitVectors(
+                new THREE.Vector3(0, 0, 1),
+                mareNormal
+            );
+            localPoint.applyQuaternion(quaternion);
+            
+            boundaryPoints.push(normalizedCenter.clone().add(localPoint));
+        }
+        
+        const boundaryGeometry = new THREE.BufferGeometry().setFromPoints(boundaryPoints);
+        const boundaryMaterial = new THREE.LineBasicMaterial({ 
+            color: this.config.mariaColor,
+            transparent: true,
+            opacity: 0.7
+        });
+        const boundaryLine = new THREE.LineLoop(boundaryGeometry, boundaryMaterial);
+        this.moonGroup.add(boundaryLine);
+    }
+
+    addSurfaceDetailLines(moonRadius) {
+        // 表面の細かい模様
+        const detailLines = [
+            // 山脈のライン
+            { 
+                points: [
+                    new THREE.Vector3(0.5, 0.2, 1.0),
+                    new THREE.Vector3(0.7, 0.1, 0.9),
+                    new THREE.Vector3(0.9, 0.0, 0.7)
                 ]
             },
             {
-                center: new THREE.Vector3(-0.4, 0.6, 0.7).normalize().multiplyScalar(moonRadius),
-                lines: [
-                    { angle: 0, length: 0.4, opacity: 0.7 },
-                    { angle: Math.PI/3, length: 0.5, opacity: 0.8 }
+                points: [
+                    new THREE.Vector3(-0.8, 0.5, 0.6),
+                    new THREE.Vector3(-0.6, 0.3, 0.8),
+                    new THREE.Vector3(-0.4, 0.1, 0.9)
                 ]
             }
         ];
         
-        linePatterns.forEach(pattern => {
-            // クレーター本体
-            const craterPoints = [];
-            for (let i = 0; i <= 12; i++) {
-                const angle = (i / 12) * Math.PI * 2;
-                const radius = 0.08;
-                const localPoint = new THREE.Vector3(
-                    Math.cos(angle) * radius,
-                    Math.sin(angle) * radius,
-                    0
-                );
-                
-                const craterNormal = pattern.center.clone().normalize();
-                const quaternion = new THREE.Quaternion().setFromUnitVectors(
-                    new THREE.Vector3(0, 0, 1),
-                    craterNormal
-                );
-                localPoint.applyQuaternion(quaternion);
-                
-                craterPoints.push(pattern.center.clone().add(localPoint));
-            }
+        detailLines.forEach(detail => {
+            const normalizedPoints = detail.points.map(point => 
+                point.clone().normalize().multiplyScalar(moonRadius)
+            );
             
-            const craterGeometry = new THREE.BufferGeometry().setFromPoints(craterPoints);
-            const craterMaterial = new THREE.LineBasicMaterial({ 
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints(normalizedPoints);
+            const lineMaterial = new THREE.LineBasicMaterial({ 
                 color: this.config.moonColor,
                 transparent: true,
-                opacity: 0.9
+                opacity: 0.5
             });
-            const craterLine = new THREE.LineLoop(craterGeometry, craterMaterial);
-            this.moonGroup.add(craterLine);
-            
-            // 放射線
-            pattern.lines.forEach(lineData => {
-                const direction = new THREE.Vector3(
-                    Math.cos(lineData.angle),
-                    Math.sin(lineData.angle),
-                    0
-                );
-                
-                const craterNormal = pattern.center.clone().normalize();
-                const quaternion = new THREE.Quaternion().setFromUnitVectors(
-                    new THREE.Vector3(0, 0, 1),
-                    craterNormal
-                );
-                direction.applyQuaternion(quaternion);
-                
-                const segments = Math.floor(lineData.length * 2); // セグメント数を減らす
-                for (let i = 0; i < segments; i++) {
-                    const segmentStart = (i / segments) * lineData.length;
-                    const segmentEnd = ((i + 0.7) / segments) * lineData.length;
-                    
-                    const startPoint = pattern.center.clone().add(direction.clone().multiplyScalar(segmentStart));
-                    const endPoint = pattern.center.clone().add(direction.clone().multiplyScalar(segmentEnd));
-                    
-                    const lineGeometry = new THREE.BufferGeometry().setFromPoints([startPoint, endPoint]);
-                    const lineMaterial = new THREE.LineBasicMaterial({ 
-                        color: this.config.moonColor,
-                        transparent: true,
-                        opacity: lineData.opacity * (1 - i / segments * 0.5)
-                    });
-                    const line = new THREE.Line(lineGeometry, lineMaterial);
-                    this.moonGroup.add(line);
-                }
-            });
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            this.moonGroup.add(line);
         });
     }
 
@@ -287,17 +381,13 @@ class ScrollMoon {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const deltaScroll = scrollTop - this.lastScrollTop;
             
-            // スクロール速度を計算
             this.scrollVelocity = this.scrollVelocity * 0.9 + deltaScroll * 0.1;
-            
-            // 回転目標値を更新
             this.targetRotationY += deltaScroll * this.config.scrollSensitivity;
             
             this.lastScrollTop = scrollTop;
             lastScrollTime = now;
         };
         
-        // スクロールイベント
         let scrollTimeout;
         window.addEventListener('scroll', () => {
             if (!scrollTimeout) {
@@ -313,8 +403,6 @@ class ScrollMoon {
 
     startAnimation() {
         console.log('アニメーションループ開始...');
-        
-        let frameCount = 0;
         
         const animate = () => {
             const now = Date.now();
@@ -338,17 +426,11 @@ class ScrollMoon {
                         this.renderer.render(this.scene, this.camera);
                     }
                     
-                    // デバッグ用フレーム数表示
-                    if (frameCount < 3) {
-                        console.log(`フレーム ${frameCount} レンダリング完了`);
-                    }
-                    
                 } catch (renderError) {
                     console.error('レンダリングエラー:', renderError);
                 }
                 
                 this.lastFrameTime = now;
-                frameCount++;
             }
             
             requestAnimationFrame(animate);
