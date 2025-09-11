@@ -32,15 +32,26 @@ class MoonLoader {
     }
 
     createMoons() {
-        // 円弧の設定（4番目の半月を中央基準に配置、間隔を広げる）
+        // 動的にアニメーションエリアのサイズを取得
+        const areaRect = this.animationArea.getBoundingClientRect();
+        const areaWidth = this.animationArea.offsetWidth;
+        const areaHeight = this.animationArea.offsetHeight;
+        
+        console.log(`アニメーションエリア: ${areaWidth}x${areaHeight}`);
+        
+        // 円弧の設定（動的中央計算）
         const moonCount = 7;
         const startAngle = -157;
         const endAngle = -20;
-        const radius = 120;
         
-        // アニメーションエリアの中央座標
-        const areaCenterX = 200;
-        const areaCenterY = 100;
+        // 画面サイズに応じて半径を調整
+        const radius = Math.min(areaWidth * 0.3, 120);
+        
+        // アニメーションエリアの中央座標（動的計算）
+        const areaCenterX = areaWidth / 2;
+        const areaCenterY = areaHeight / 2;
+        
+        console.log(`中央座標: (${areaCenterX}, ${areaCenterY}), 半径: ${radius}`);
         
         // 角度計算
         const angleRange = endAngle - startAngle;
@@ -89,6 +100,8 @@ class MoonLoader {
 
             this.animationArea.appendChild(moon);
             this.moons.push(moon);
+            
+            console.log(`月${i+1}: (${x.toFixed(1)}, ${y.toFixed(1)})`);
         }
     }
 
