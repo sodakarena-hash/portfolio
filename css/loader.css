@@ -32,25 +32,39 @@
     max-width: 500px;
 }
 
-/* アニメーションエリア - JavaScriptが完全制御 */
 .moon-animation-area {
     position: relative;
+    width: 400px;
+    height: 200px;
     margin: 0 auto;
-    /* JavaScriptで寸法を設定するため、CSSでは最小限のスタイルのみ */
-    /* デバッグ用境界線（一時的） */
-    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 月のスタイル - JavaScriptで上書きされるが基本値として残す */
+/* 月のスタイル（オリジナル通り） */
 .moon {
-    /* JavaScriptで完全に制御されるため、ここは空にする */
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: all 0.8s ease;
+    z-index: 1;
 }
 
 .moon-shadow {
-    /* JavaScriptで完全に制御されるため、ここは空にする */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    background: #000000;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
 }
 
-/* 月相の設定のみCSSで制御 */
+/* 月相の設定（オリジナル通り） */
 .moon.new-moon .moon-shadow { transform: translateX(-100%); }
 .moon.thin-crescent .moon-shadow { transform: translateX(-75%); }
 .moon.crescent .moon-shadow { transform: translateX(-50%); }
@@ -58,6 +72,25 @@
 .moon.waxing-gibbous .moon-shadow { transform: translateX(30%); }
 .moon.gibbous .moon-shadow { transform: translateX(60%); }
 .moon.full .moon-shadow { transform: translateX(100%); }
+
+/* アニメーション状態（オリジナル通り） */
+.moon.moving {
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(205, 148, 105, 0.6);
+}
+
+.moon.absorbed {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.1);
+    pointer-events: none;
+}
+
+.moon.enhanced {
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.5),
+        0 0 30px rgba(205, 148, 105, 0.3);
+    transform: translate(-50%, -50%) scale(1.1);
+}
 
 /* ローディングタイトル */
 .loading-title {
@@ -154,11 +187,26 @@
     color: #CD9469;
 }
 
-/* レスポンシブ調整は最小限に */
+/* レスポンシブデザイン（ローディング部分）- CSSとJSの寸法を完全一致 */
 @media (max-width: 768px) {
     .moon-loading-container {
         gap: 40px;
         max-width: 90%;
+    }
+    
+    .moon-animation-area {
+        width: 320px;
+        height: 160px;
+    }
+    
+    .moon {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .moon-shadow {
+        width: 25px;
+        height: 25px;
     }
     
     .loading-progress {
@@ -173,8 +221,30 @@
         max-width: 95%;
     }
     
+    .moon-animation-area {
+        width: 280px;
+        height: 140px;
+    }
+    
     .loading-progress {
         max-width: 250px;
         margin-top: 25px;
+    }
+}
+
+@media (max-width: 360px) {
+    .moon-animation-area {
+        width: 240px;
+        height: 120px;
+    }
+    
+    .moon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .moon-shadow {
+        width: 20px;
+        height: 20px;
     }
 }
