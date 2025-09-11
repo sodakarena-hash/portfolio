@@ -309,3 +309,62 @@ setTimeout(() => {
         gm_authFailure();
     }
 }, 3000);
+
+// デバッグ用ヘルパー関数
+function updateDebugStatus(key, value) {
+    const element = document.getElementById(key);
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+function logError(message, error) {
+    console.error(message, error);
+    updateDebugStatus('errorStatus', message);
+}
+
+// 初期化
+let scrollMoon;
+
+window.addEventListener('load', () => {
+    console.log('ページ読み込み完了、初期化開始');
+    
+    // Three.jsの確認
+    if (typeof THREE !== 'undefined') {
+        console.log('Three.js バージョン:', THREE.REVISION);
+        updateDebugStatus('threeStatus', `r${THREE.REVISION}`);
+    } else {
+        updateDebugStatus('threeStatus', '未読み込み');
+    }
+    
+    // 3Dムーン初期化（ScrollMoonクラスが利用可能な場合）
+    if (typeof ScrollMoon !== 'undefined') {
+        try {
+            scrollMoon = new ScrollMoon();
+            scrollMoon.init();
+        } catch (error) {
+            logError('3D初期化失敗', error);
+        }
+    } else {
+        updateDebugStatus('initStatus', 'ScrollMoonクラス未読み込み');
+    }
+    
+    // メインサイト機能初期化
+    setupMainSite();
+    
+    console.log('初期化処理完了');
+});
+
+// リサイズ対応
+window.addEventListener('resize', () => {
+    if (scrollMoon && scrollMoon.isInitialized) {
+        scrollMoon.handleResize();
+    }
+});
+
+// ページ離脱時のクリーンアップ
+window.addEventListener('beforeunload', () => {
+    if (scrollMoon) {
+        scrollMoon.dispose();
+    }
+});
