@@ -1,786 +1,110 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スクロール連動3Dアニメーション</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow-x: hidden;
-        }
-
-        #threejs-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1;
-        }
-
-        .content {
-            position: relative;
-            z-index: -1; /* 3Dの後ろに配置 */
-            padding: 50px;
-            background: rgba(255, 255, 255, 0.3); /* より透明に */
-            margin: 100vh 0;
-        }
-
-        .section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.2); /* より透明に */
-            margin: 50px 0;
-            border-radius: 20px;
-            backdrop-filter: blur(5px); /* ぼかしを軽減 */
-        }
-
-        .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-            z-index: 1000;
-            transition: width 0.1s ease;
-        }
-
-        .animation-info {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            z-index: 1000;
-        }
-
-        .controls {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            z-index: 1000;
-            width: 300px;
-        }
-
-        .control-group {
-            margin-bottom: 15px;
-        }
-
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .control-group input[type="range"] {
-            width: 100%;
-            margin-bottom: 5px;
-        }
-
-        .control-group .value {
-            color: #4ecdc4;
-            font-size: 12px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>3Dキャラ スクロール連動</title>
+  <style>
+    body { margin: 0; height: 200vh; } /* スクロール領域 */
+    canvas { display: block; }
+    #debug {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: white;
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      font-size: 14px;
+      border-radius: 5px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.18"></script>
 </head>
 <body>
-    <div class="controls">
-        <h3 style="margin-top: 0; margin-bottom: 15px;">3Dモデル調整</h3>
-        
-        <div class="control-group">
-            <label>スケール（サイズ）</label>
-            <input type="range" id="scaleSlider" min="0.005" max="0.5" step="0.005" value="0.01">
-            <div class="value">値: <span id="scaleValue">0.01</span></div>
-        </div>
+  <div id="debug">
+    <div>Scroll: <span id="scrollProgress">0%</span></div>
+    <div>Frame: <span id="currentFrame">0 / 24</span></div>
+  </div>
 
-        <div class="control-group">
-            <label>X位置（左右）</label>
-            <input type="range" id="posXSlider" min="-10" max="10" step="0.1" value="0">
-            <div class="value">値: <span id="posXValue">0.0</span></div>
-        </div>
+  <script>
+    let scene, camera, renderer, model, mixer, animationAction;
+    let scrollY = 0, targetScrollY = 0;
 
-        <div class="control-group">
-            <label>Y位置（上下）</label>
-            <input type="range" id="posYSlider" min="-15" max="5" step="0.1" value="0">
-            <div class="value">値: <span id="posYValue">0.0</span></div>
-        </div>
+    init();
+    animate();
 
-        <div class="control-group">
-            <label>Z位置（前後）</label>
-            <input type="range" id="posZSlider" min="-10" max="10" step="0.1" value="0">
-            <div class="value">値: <span id="posZValue">0.0</span></div>
-        </div>
+    function init() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x202020);
 
-        <div class="control-group">
-            <label>Y回転（向き）</label>
-            <input type="range" id="rotYSlider" min="0" max="360" step="1" value="180">
-            <div class="value">値: <span id="rotYValue">180°</span></div>
-        </div>
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 1.5, 5); // ← GUIで調整対象
+      camera.lookAt(0, 1, 0);
 
-        <div class="control-group">
-            <label>カメラX（左右）</label>
-            <input type="range" id="cameraXSlider" min="-10" max="10" step="0.1" value="-2">
-            <div class="value">値: <span id="cameraXValue">-2.0</span></div>
-        </div>
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-        <div class="control-group">
-            <label>カメラ距離</label>
-            <input type="range" id="cameraDistSlider" min="1" max="20" step="0.1" value="8">
-            <div class="value">値: <span id="cameraDistValue">8.0</span></div>
-        </div>
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(5, 10, 7.5);
+      scene.add(light);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
-        <div class="control-group">
-            <label>カメラ高さ</label>
-            <input type="range" id="cameraHeightSlider" min="-5" max="25" step="0.1" value="15">
-            <div class="value">値: <span id="cameraHeightValue">15.0</span></div>
-        </div><label>カメラ高さ</label>
-            <input type="range" id="cameraHeightSlider" min="-15" max="5" step="0.1" value="1">
-            <div class="value">値: <span id="cameraHeightValue">1.0</span></div>
-        </div>
+      // モデル読み込み
+      const loader = new THREE.GLTFLoader();
+      loader.load("models/iori.glb", (gltf) => {
+        model = gltf.scene;
+        scene.add(model);
 
-        <button onclick="resetSettings()" style="background: #4ecdc4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px;">
-            リセット
-        </button>
-    </div>
-
-    <div class="progress-bar" id="progressBar"></div>
-    
-    <div class="animation-info">
-        <div>スクロール進行度: <span id="scrollProgress">0%</span></div>
-        <div>アニメーション時間: <span id="animationTime">0.00</span></div>
-        <div>フレーム: <span id="currentFrame">0 / 24</span></div>
-        <div style="border-top: 1px solid #444; margin-top: 10px; padding-top: 10px;">
-            <div>カメラ位置: <span id="cameraPos">-</span></div>
-            <div>3D位置: <span id="modelPos">-</span></div>
-            <div>カメラ向き: <span id="cameraTarget">-</span></div>
-        </div>
-    </div>
-
-    <div id="threejs-container"></div>
-
-    <div class="content">
-        <div class="section">
-            <!-- スクロール用のスペース -->
-        </div>
-        
-        <div class="section">
-            <!-- スクロール用のスペース -->
-        </div>
-        
-        <div class="section">
-            <!-- スクロール用のスペース -->
-        </div>
-        
-        <div class="section">
-            <!-- スクロール用のスペース -->
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
-    <script>
-        // Three.js セットアップ
-        let scene, camera, renderer, mixer, clock;
-        let character = null;
-        let animationAction = null;
-        let originalCharacterPosition = { x: 0, y: 0, z: 0 };
-        let originalCharacterScale = 1;
-
-        function init() {
-            // シーン作成
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x000000, 0); // 透明背景
-
-            // カメラ設定 - かなり高い位置に
-            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.001, 10000);
-            camera.position.set(-2, 15, 8); // Y=15でかなり高い位置
-            camera.lookAt(0, -2, 0); // 下を見下ろす
-
-            // レンダラー設定
-            renderer = new THREE.WebGLRenderer({ 
-                antialias: true, 
-                alpha: true,
-                preserveDrawingBuffer: true,
-                logarithmicDepthBuffer: true // 深度バッファの精度向上
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.outputEncoding = THREE.sRGBEncoding;
-            renderer.sortObjects = true; // 描画順序を適切に処理
-            renderer.setClearColor(0x000000, 0); // 透明背景
-            renderer.autoClear = false; // 手動クリア制御
-            
-            document.getElementById('threejs-container').appendChild(renderer.domElement);
-
-            // ライティング設定
-            setupLighting();
-
-            // プレースホルダーは作成しない - GLBファイルのみ表示
-            console.log('GLBファイルの読み込みを待機中...');
-
-            // アニメーションミキサー
-            clock = new THREE.Clock();
-
-            // コントロールを初期化（モデル読み込み前でも動作するように）
-            setupControls();
-
-            // リサイズ対応
-            window.addEventListener('resize', onWindowResize);
-            
-            // スクロールイベント
-            window.addEventListener('scroll', onScroll);
-
-            // レンダリングループ開始
-            animate();
+        mixer = new THREE.AnimationMixer(model);
+        if (gltf.animations.length > 0) {
+          animationAction = mixer.clipAction(gltf.animations[0]);
+          animationAction.play();
+          animationAction.paused = true; // 自動再生しない
         }
+      });
 
-        function setupLighting() {
-            // 環境光
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
+      // スクロール監視
+      window.addEventListener("scroll", () => {
+        targetScrollY = window.scrollY;
+      });
 
-            // メインライト
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(5, 10, 5);
-            directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 2048;
-            directionalLight.shadow.mapSize.height = 2048;
-            scene.add(directionalLight);
+      // lil-guiでカメラ調整
+      const gui = new lil.GUI();
+      const camFolder = gui.addFolder("Camera");
+      camFolder.add(camera.position, "x", -10, 10, 0.1);
+      camFolder.add(camera.position, "y", -10, 10, 0.1);
+      camFolder.add(camera.position, "z", -10, 10, 0.1);
+      camFolder.open();
 
-            // リムライト
-            const rimLight = new THREE.DirectionalLight(0x4488ff, 0.3);
-            rimLight.position.set(-5, 5, -5);
-            scene.add(rimLight);
-        }
+      window.addEventListener("resize", onWindowResize);
+    }
 
-        // 実際のGLBファイルを読み込む場合の関数
-        function loadGLBModel(url) {
-            console.log('GLBファイルの読み込み開始:', url);
-            
-            // GLTFLoaderが存在するかチェック（複数の方法で確認）
-            if (typeof THREE.GLTFLoader === 'undefined' && typeof GLTFLoader === 'undefined') {
-                console.error('GLTFLoaderが読み込まれていません');
-                console.log('利用可能なTHREEオブジェクト:', Object.keys(THREE));
-                return;
-            }
-            
-            // GLTFLoaderのインスタンスを作成（どちらの形式でも対応）
-            let loader;
-            if (typeof THREE.GLTFLoader !== 'undefined') {
-                loader = new THREE.GLTFLoader();
-                console.log('THREE.GLTFLoaderを使用');
-                
-                // DRACOLoaderの設定
-                if (typeof THREE.DRACOLoader !== 'undefined' || typeof DRACOLoader !== 'undefined') {
-                    const dracoLoader = typeof THREE.DRACOLoader !== 'undefined' 
-                        ? new THREE.DRACOLoader() 
-                        : new DRACOLoader();
-                    dracoLoader.setDecoderPath('https://unpkg.com/three@0.128.0/examples/js/libs/draco/');
-                    loader.setDRACOLoader(dracoLoader);
-                    console.log('DRACOLoaderを設定しました');
-                }
-            } else if (typeof GLTFLoader !== 'undefined') {
-                loader = new GLTFLoader();
-                console.log('GLTFLoaderを使用');
-                
-                // DRACOLoaderの設定
-                if (typeof DRACOLoader !== 'undefined') {
-                    const dracoLoader = new DRACOLoader();
-                    dracoLoader.setDecoderPath('https://unpkg.com/three@0.128.0/examples/js/libs/draco/');
-                    loader.setDRACOLoader(dracoLoader);
-                    console.log('DRACOLoaderを設定しました');
-                }
-            }
-            
-            loader.load(
-                url,
-                // 成功時
-                (gltf) => {
-                    console.log('GLBファイルの読み込み成功:', gltf);
-                    
-                    character = gltf.scene;
-                    scene.add(character);
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
 
-                    // モデルのバウンディングボックスを計算
-                    const box = new THREE.Box3().setFromObject(character);
-                    const size = box.getSize(new THREE.Vector3());
-                    const center = box.getCenter(new THREE.Vector3());
-                    
-                    console.log('モデルサイズ:', size);
-                    console.log('モデル中心:', center);
-                    
-                    // 自動スケーリングを無効化し、極小サイズを直接適用
-                    const smallScale = 0.01; // 非常に小さいスケール
-                    character.scale.setScalar(smallScale);
-                    console.log('強制適用スケール:', smallScale);
-                    
-                    // モデルを地面に配置
-                    character.position.x = -center.x * smallScale;
-                    character.position.y = -box.min.y * smallScale;
-                    character.position.z = -center.z * smallScale;
-                    
-                    if (gltf.animations && gltf.animations.length > 0) {
-                        console.log('アニメーション発見:', gltf.animations.length + '個');
-                        mixer = new THREE.AnimationMixer(character);
-                        animationAction = mixer.clipAction(gltf.animations[0]);
-                        animationAction.setLoop(THREE.LoopOnce);
-                        animationAction.clampWhenFinished = true;
-                        animationAction.play();
-                        animationAction.paused = true;
-                    } else {
-                        console.log('アニメーションが見つかりません');
-                    }
+    function animate() {
+      requestAnimationFrame(animate);
 
-                    console.log('GLBモデルの設定完了');
-                    
-                    // 初期スケールを強制適用
-                    character.scale.setScalar(0.01); // 非常に小さく設定
-                    console.log('初期スケール0.01を適用');
-                    
-                    // 強制的にモデル解析を実行
-                    setTimeout(() => {
-                        analyzeModel();
-                    }, 1000);
-                    
-                    // カメラをモデルに合わせて調整
-                    const maxDim = Math.max(size.x, size.y, size.z) * scale;
-                    const cameraDistance = maxDim * 2;
-                    camera.position.set(0, targetHeight * 0.8, cameraDistance);
-                    camera.lookAt(0, targetHeight * 0.5, 0);
-                },
-                // 進行状況
-                (progress) => {
-                    console.log('読み込み進行状況:', (progress.loaded / progress.total * 100) + '%');
-                },
-                // エラー時
-                (error) => {
-                    console.error('GLBファイルの読み込みエラー:', error);
-                    console.log('GLBファイルが見つかりません。ファイルパスを確認してください。');
-                }
-            );
-        }
+      scrollY += (targetScrollY - scrollY) * 0.1;
+      const scrollProgress = Math.min(scrollY / (document.body.scrollHeight - window.innerHeight), 1);
 
-        function onScroll() {
-            const scrollTop = window.pageYOffset;
-            const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollProgress = Math.min(scrollTop / documentHeight, 1);
+      if (mixer && animationAction) {
+        const duration = animationAction.getClip().duration;
+        const time = scrollProgress * duration;
+        animationAction.time = time;
+        mixer.update(0);
 
-            // プログレスバー更新
-            document.getElementById('progressBar').style.width = (scrollProgress * 100) + '%';
-            document.getElementById('scrollProgress').textContent = Math.round(scrollProgress * 100) + '%';
+        document.getElementById("scrollProgress").textContent = Math.round(scrollProgress * 100) + "%";
+        document.getElementById("currentFrame").textContent = Math.round(scrollProgress * 24) + " / 24";
+      }
 
-            // アニメーション制御 - GLBモデルが読み込まれている場合のみ
-            if (character && mixer && animationAction) {
-                // GLBアニメーションがある場合
-                const animationDuration = animationAction.getClip().duration;
-                const animationTime = scrollProgress * animationDuration;
-                
-                // アニメーション時間を設定
-                animationAction.time = animationTime;
-                mixer.update(0); // デルタタイムを0にしてマニュアル制御
-                
-                document.getElementById('animationTime').textContent = animationTime.toFixed(2);
-                document.getElementById('currentFrame').textContent = 
-                    Math.round(scrollProgress * 24) + ' / 24';
-            } else {
-                // GLBモデルが読み込まれていない場合
-                document.getElementById('animationTime').textContent = '待機中...';
-                document.getElementById('currentFrame').textContent = '0 / 24';
-            }
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            // カメラの微妙な動き
-            const time = clock.getElapsedTime();
-            const baseX = camera.userData.baseX || 3;
-            const baseY = camera.userData.baseY || -8.8;
-            const baseZ = camera.userData.baseZ || 8;
-            
-            camera.position.x = baseX + Math.sin(time * 0.1) * 0.1;
-            camera.position.y = baseY + Math.sin(time * 0.15) * 0.05;
-            
-            // デバッグ情報の更新
-            document.getElementById('cameraPos').textContent = 
-                `(${camera.position.x.toFixed(1)}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)})`;
-            
-            if (character) {
-                document.getElementById('modelPos').textContent = 
-                    `(${character.position.x.toFixed(1)}, ${character.position.y.toFixed(1)}, ${character.position.z.toFixed(1)})`;
-            } else {
-                document.getElementById('modelPos').textContent = 'モデル未読み込み';
-            }
-            
-            document.getElementById('cameraTarget').textContent = `Y=${camera.userData.baseY || -8.8}を向いている`;
-            
-            // 手動でクリアしてからレンダリング
-            renderer.clear();
-            renderer.render(scene, camera);
-        }
-
-        // コントロール設定
-        function setupControls() {
-            // カメラの初期設定（かなり高い位置）
-            camera.userData = {
-                baseX: -2,
-                baseY: 15,
-                baseZ: 8
-            };
-            
-            const scaleSlider = document.getElementById('scaleSlider');
-            const posXSlider = document.getElementById('posXSlider');
-            const posYSlider = document.getElementById('posYSlider');
-            const posZSlider = document.getElementById('posZSlider');
-            const rotYSlider = document.getElementById('rotYSlider');
-            const cameraXSlider = document.getElementById('cameraXSlider');
-            const cameraDistSlider = document.getElementById('cameraDistSlider');
-            const cameraHeightSlider = document.getElementById('cameraHeightSlider');
-
-            // カメラ高さ調整（lookAtも更新）
-            cameraHeightSlider.addEventListener('input', (e) => {
-                const height = parseFloat(e.target.value);
-                console.log('カメラ高さ変更:', height);
-                camera.position.y = height;
-                camera.userData.baseY = height;
-                // カメラの視線も更新（キャラクターの中央を見る）
-                camera.lookAt(0, 1, 0); 
-                document.getElementById('cameraHeightValue').textContent = height.toFixed(1);
-            });
-
-            // その他のイベントリスナーは同じ
-            scaleSlider.addEventListener('input', (e) => {
-                const scale = parseFloat(e.target.value);
-                console.log('スケール変更:', scale);
-                if (character) {
-                    character.scale.setScalar(scale);
-                }
-                document.getElementById('scaleValue').textContent = scale.toFixed(2);
-            });
-
-            posXSlider.addEventListener('input', (e) => {
-                const posX = parseFloat(e.target.value);
-                console.log('X位置変更:', posX);
-                if (character) {
-                    character.position.x = originalCharacterPosition.x + posX;
-                }
-                document.getElementById('posXValue').textContent = posX.toFixed(1);
-            });
-
-            posYSlider.addEventListener('input', (e) => {
-                const posY = parseFloat(e.target.value);
-                console.log('Y位置変更:', posY);
-                if (character) {
-                    character.position.y = originalCharacterPosition.y + posY;
-                }
-                document.getElementById('posYValue').textContent = posY.toFixed(1);
-            });
-
-            posZSlider.addEventListener('input', (e) => {
-                const posZ = parseFloat(e.target.value);
-                console.log('Z位置変更:', posZ);
-                if (character) {
-                    character.position.z = originalCharacterPosition.z + posZ;
-                }
-                document.getElementById('posZValue').textContent = posZ.toFixed(1);
-            });
-
-            rotYSlider.addEventListener('input', (e) => {
-                const rotY = parseFloat(e.target.value);
-                console.log('Y回転変更:', rotY);
-                if (character) {
-                    character.rotation.y = (rotY * Math.PI) / 180;
-                }
-                document.getElementById('rotYValue').textContent = rotY.toFixed(0) + '°';
-            });
-
-            cameraXSlider.addEventListener('input', (e) => {
-                const cameraX = parseFloat(e.target.value);
-                console.log('カメラX変更:', cameraX);
-                camera.position.x = cameraX;
-                camera.userData.baseX = cameraX;
-                document.getElementById('cameraXValue').textContent = cameraX.toFixed(1);
-            });
-
-            cameraDistSlider.addEventListener('input', (e) => {
-                const distance = parseFloat(e.target.value);
-                console.log('カメラ距離変更:', distance);
-                camera.position.z = distance;
-                camera.userData.baseZ = distance;
-                document.getElementById('cameraDistValue').textContent = distance.toFixed(1);
-            });
-            
-            console.log('コントロール設定完了');
-        }
-
-        // リセット機能
-        function resetSettings() {
-            console.log('設定をリセット中...');
-            
-            document.getElementById('scaleSlider').value = 0.01;
-            document.getElementById('posXSlider').value = 0;
-            document.getElementById('posYSlider').value = 0;
-            document.getElementById('posZSlider').value = 0;
-            document.getElementById('rotYSlider').value = 180;
-            document.getElementById('cameraXSlider').value = -2;
-            document.getElementById('cameraDistSlider').value = 8;
-            document.getElementById('cameraHeightSlider').value = 15;
-
-            if (character) {
-                character.scale.setScalar(0.01); // 極小サイズを強制適用
-                character.position.set(originalCharacterPosition.x, originalCharacterPosition.y, originalCharacterPosition.z);
-                character.rotation.y = Math.PI; // 180度回転（後ろ向き）
-                console.log('キャラクター位置リセット完了 - スケール0.01適用');
-            }
-
-            camera.position.set(-2, 15, 8);
-            camera.lookAt(0, -2, 0);
-            camera.userData.baseX = -2;
-            camera.userData.baseY = 15;
-            camera.userData.baseZ = 8;
-
-            // 値の表示も更新
-            document.getElementById('scaleValue').textContent = '0.01';
-            document.getElementById('posXValue').textContent = '0.0';
-            document.getElementById('posYValue').textContent = '0.0';
-            document.getElementById('posZValue').textContent = '0.0';
-            document.getElementById('rotYValue').textContent = '180°';
-            document.getElementById('cameraXValue').textContent = '-2.0';
-            document.getElementById('cameraDistValue').textContent = '8.0';
-            document.getElementById('cameraHeightValue').textContent = '15.0';
-            
-            console.log('リセット完了');
-        }
-
-        // モデル詳細解析関数
-        function analyzeModel() {
-            if (!character) {
-                console.log('キャラクターがまだ読み込まれていません');
-                return;
-            }
-            
-            console.log('=== 詳細モデル解析開始 ===');
-            
-            let meshCount = 0;
-            let materialCount = 0;
-            const textureMap = new Map(); // テクスチャの重複チェック用
-            
-            character.traverse((child) => {
-                if (child.isMesh) {
-                    meshCount++;
-                    
-                    console.log(`メッシュ ${meshCount}: ${child.name || 'Unnamed'}`);
-                    console.log(`  visible: ${child.visible}, vertices: ${child.geometry ? child.geometry.attributes.position?.count : 0}`);
-                    
-                    // マテリアル情報
-                    if (child.material) {
-                        if (Array.isArray(child.material)) {
-                            child.material.forEach((material, index) => {
-                                materialCount++;
-                                analyzeMaterial(material, materialCount, child.name, textureMap);
-                            });
-                        } else {
-                            materialCount++;
-                            analyzeMaterial(child.material, materialCount, child.name, textureMap);
-                        }
-                    } else {
-                        console.log('  マテリアルなし');
-                    }
-                    
-                    // 強制的に可視化
-                    child.visible = true;
-                    child.frustumCulled = false;
-                }
-            });
-            
-            console.log(`=== 解析完了: メッシュ${meshCount}個, マテリアル${materialCount}個 ===`);
-            
-            // テクスチャ共有の分析
-            console.log('=== テクスチャ共有分析 ===');
-            textureMap.forEach((materials, textureId) => {
-                if (materials.length > 1) {
-                    console.log(`❌ テクスチャ共有問題発見:`);
-                    console.log(`  テクスチャID: ${textureId}`);
-                    console.log(`  共有マテリアル: ${materials.join(', ')}`);
-                    console.log(`  → これが色混同の原因です`);
-                }
-            });
-        }
-        
-        function analyzeMaterial(material, index, meshName, textureMap) {
-            console.log(`  マテリアル ${index} (${material.name || 'Unnamed'})`);
-            console.log(`    color: ${material.color ? `rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})` : 'なし'}`);
-            console.log(`    meshName: ${meshName}`);
-            
-            const materialName = material.name?.toLowerCase() || '';
-            const meshNameLower = meshName?.toLowerCase() || '';
-            const originalColor = material.color ? material.color.clone() : null;
-            
-            // Solidifyで作られた輪郭線メッシュの判定
-            const isSolidifyOutline = meshNameLower.includes('.001') || 
-                                    meshNameLower.includes('.002') || 
-                                    meshNameLower.includes('.003') ||
-                                    meshNameLower.includes('_outline') ||
-                                    meshNameLower.includes('_rim') ||
-                                    meshNameLower.includes('_edge') ||
-                                    meshNameLower.includes('outline') ||
-                                    meshNameLower.includes('rim') ||
-                                    meshNameLower.includes('edge') ||
-                                    // 明示的な輪郭線マテリアル名
-                                    materialName.includes('輪郭') || 
-                                    materialName.includes('outline') ||
-                                    materialName.includes('rim') ||
-                                    materialName.includes('line');
-            
-            console.log(`    Solidify輪郭線判定: ${isSolidifyOutline}`);
-            
-            // Solidify輪郭線メッシュの処理
-            if (isSolidifyOutline) {
-                console.log(`    🔥 Solidify輪郭線メッシュ処理開始`);
-                
-                // 輪郭線の色設定
-                if (originalColor && (originalColor.r > 0.3 && originalColor.g < 0.3 && originalColor.b < 0.3)) {
-                    // 元の色が赤系の場合はそれを維持
-                    material.color = originalColor.clone();
-                    console.log(`    Solidify輪郭線: 元の赤色を維持`);
-                } else if (originalColor && (originalColor.r < 0.5 || originalColor.g < 0.5 || originalColor.b < 0.5)) {
-                    // 元の色が暗い場合はそれを維持
-                    material.color = originalColor.clone();
-                    console.log(`    Solidify輪郭線: 元の暗い色を維持`);
-                } else {
-                    // その他の場合は黒い輪郭線に設定
-                    material.color = new THREE.Color(0.0, 0.0, 0.0);
-                    console.log(`    Solidify輪郭線: 黒色を設定`);
-                }
-                
-                // Solidify用の設定（法線が既に反転されているので正面描画）
-                material.side = THREE.FrontSide; // Solidifyで法線反転済みなので正面描画
-                material.depthWrite = true;
-                material.depthTest = true;
-                material.transparent = false;
-                material.alphaTest = 0;
-                
-                // テクスチャを無効化（輪郭線には不要）
-                if (material.map) {
-                    material.map = null;
-                    console.log(`    Solidify輪郭線: テクスチャを無効化`);
-                }
-                
-                console.log(`    ✅ Solidify輪郭線設定完了: FrontSide（法線反転済み）, 輪郭線色, テクスチャなし`);
-                
-            } else if (material.map && material.map.image) {
-                // 通常のテクスチャありメッシュ（元のメッシュ）
-                const texture = material.map;
-                const textureId = texture.uuid || texture.image.src || 'unknown';
-                const matName = material.name || 'Unnamed';
-                
-                // テクスチャ共有の記録
-                if (!textureMap.has(textureId)) {
-                    textureMap.set(textureId, []);
-                }
-                textureMap.get(textureId).push(matName);
-                
-                console.log(`    通常メッシュ: テクスチャあり (${texture.image.width}x${texture.image.height})`);
-                
-                // UV座標の確認
-                if (texture.repeat) {
-                    console.log(`    UV repeat: ${texture.repeat.x}, ${texture.repeat.y}`);
-                }
-                if (texture.offset) {
-                    console.log(`    UV offset: ${texture.offset.x}, ${texture.offset.y}`);
-                }
-                
-                // 通常メッシュは白色でテクスチャを表示
-                material.color = new THREE.Color(1, 1, 1);
-                console.log(`    通常メッシュ: 白色設定でテクスチャ表示`);
-                
-                // テクスチャ設定の最適化
-                texture.encoding = THREE.sRGBEncoding;
-                texture.flipY = false;
-                texture.wrapS = THREE.RepeatWrapping;
-                texture.wrapT = THREE.RepeatWrapping;
-                texture.needsUpdate = true;
-                
-                // 通常メッシュ設定
-                material.side = THREE.FrontSide;
-                material.depthWrite = true;
-                material.depthTest = true;
-                
-            } else {
-                // テクスチャなしの通常メッシュ
-                console.log(`    通常メッシュ: テクスチャなし`);
-                
-                if (materialName.includes('髪') || materialName.includes('hair')) {
-                    material.color = new THREE.Color(0x8B4513); // 茶色
-                    console.log(`    髪: 茶色を設定`);
-                } else if (materialName.includes('肌') || materialName.includes('skin') || 
-                          meshNameLower.includes('face') || meshNameLower.includes('body')) {
-                    material.color = new THREE.Color(0xFFDDBB); // 肌色
-                    console.log(`    肌: 肌色を設定`);
-                } else if (originalColor && (originalColor.r !== 1 || originalColor.g !== 1 || originalColor.b !== 1)) {
-                    // 元の色が白でない場合は、元の色を維持
-                    material.color = originalColor;
-                    console.log(`    その他: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
-                } else {
-                    material.color = new THREE.Color(0xCCCCCC); // グレー
-                    console.log(`    その他: グレーを設定`);
-                }
-                
-                // 通常メッシュ設定
-                material.side = THREE.FrontSide;
-                material.depthWrite = true;
-                material.depthTest = true;
-            }
-            
-            // 共通設定（Solidify輪郭線以外）
-            if (!isSolidifyOutline) {
-                material.alphaTest = 0.001;
-                if (material.opacity < 0.99) {
-                    material.transparent = true;
-                }
-            }
-            
-            material.needsUpdate = true;
-            
-            console.log(`    最終設定: side=${material.side === THREE.FrontSide ? 'Front' : material.side === THREE.BackSide ? 'Back' : 'Double'}, color=rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
-        }
-
-        // 初期化
-        init();
-
-        // GLBファイルを読み込む
-        loadGLBModel('models/iori.glb');
-    </script>
+      renderer.render(scene, camera);
+    }
+  </script>
 </body>
 </html>
