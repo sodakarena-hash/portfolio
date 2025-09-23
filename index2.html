@@ -28,9 +28,9 @@
 
         .content {
             position: relative;
-            z-index: 2;
+            z-index: -1; /* 3Dの後ろに配置 */
             padding: 50px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.3); /* より透明に */
             margin: 100vh 0;
         }
 
@@ -43,10 +43,10 @@
             font-weight: bold;
             color: #333;
             text-align: center;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.2); /* より透明に */
             margin: 50px 0;
             border-radius: 20px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px); /* ぼかしを軽減 */
         }
 
         .progress-bar {
@@ -112,8 +112,8 @@
         
         <div class="control-group">
             <label>スケール（サイズ）</label>
-            <input type="range" id="scaleSlider" min="0.01" max="2" step="0.01" value="0.05">
-            <div class="value">値: <span id="scaleValue">0.05</span></div>
+            <input type="range" id="scaleSlider" min="0.005" max="0.5" step="0.005" value="0.01">
+            <div class="value">値: <span id="scaleValue">0.01</span></div>
         </div>
 
         <div class="control-group">
@@ -154,8 +154,8 @@
 
         <div class="control-group">
             <label>カメラ高さ</label>
-            <input type="range" id="cameraHeightSlider" min="-5" max="15" step="0.1" value="6">
-            <div class="value">値: <span id="cameraHeightValue">6.0</span></div>
+            <input type="range" id="cameraHeightSlider" min="-5" max="20" step="0.1" value="10">
+            <div class="value">値: <span id="cameraHeightValue">10.0</span></div>
         </div><label>カメラ高さ</label>
             <input type="range" id="cameraHeightSlider" min="-15" max="5" step="0.1" value="1">
             <div class="value">値: <span id="cameraHeightValue">1.0</span></div>
@@ -215,10 +215,10 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000000, 0); // 透明背景
 
-            // カメラ設定 - さらに高い位置に調整
+            // カメラ設定 - もっと高い位置に
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.001, 10000);
-            camera.position.set(-2, 6, 8); // Y=6でより高く
-            camera.lookAt(0, 1, 0); // キャラクターの中央付近を見る
+            camera.position.set(-2, 10, 8); // Y=10でかなり高い位置
+            camera.lookAt(0, 0, 0); // 地面付近を見下ろす
 
             // レンダラー設定
             renderer = new THREE.WebGLRenderer({ 
@@ -455,10 +455,10 @@
 
         // コントロール設定
         function setupControls() {
-            // カメラの初期設定（より高い位置）
+            // カメラの初期設定（もっと高い位置、小さいサイズ）
             camera.userData = {
                 baseX: -2,
-                baseY: 6,
+                baseY: 10,
                 baseZ: 8
             };
             
@@ -551,37 +551,37 @@
         function resetSettings() {
             console.log('設定をリセット中...');
             
-            document.getElementById('scaleSlider').value = 0.05;
+            document.getElementById('scaleSlider').value = 0.01;
             document.getElementById('posXSlider').value = 0;
             document.getElementById('posYSlider').value = 0;
             document.getElementById('posZSlider').value = 0;
             document.getElementById('rotYSlider').value = 180;
             document.getElementById('cameraXSlider').value = -2;
             document.getElementById('cameraDistSlider').value = 8;
-            document.getElementById('cameraHeightSlider').value = 6;
+            document.getElementById('cameraHeightSlider').value = 10;
 
             if (character) {
-                character.scale.setScalar(0.05);
+                character.scale.setScalar(0.01);
                 character.position.set(originalCharacterPosition.x, originalCharacterPosition.y, originalCharacterPosition.z);
                 character.rotation.y = Math.PI; // 180度回転（後ろ向き）
                 console.log('キャラクター位置リセット完了');
             }
 
-            camera.position.set(-2, 6, 8);
-            camera.lookAt(0, 1, 0);
+            camera.position.set(-2, 10, 8);
+            camera.lookAt(0, 0, 0);
             camera.userData.baseX = -2;
-            camera.userData.baseY = 6;
+            camera.userData.baseY = 10;
             camera.userData.baseZ = 8;
 
             // 値の表示も更新
-            document.getElementById('scaleValue').textContent = '0.05';
+            document.getElementById('scaleValue').textContent = '0.01';
             document.getElementById('posXValue').textContent = '0.0';
             document.getElementById('posYValue').textContent = '0.0';
             document.getElementById('posZValue').textContent = '0.0';
             document.getElementById('rotYValue').textContent = '180°';
             document.getElementById('cameraXValue').textContent = '-2.0';
             document.getElementById('cameraDistValue').textContent = '8.0';
-            document.getElementById('cameraHeightValue').textContent = '6.0';
+            document.getElementById('cameraHeightValue').textContent = '10.0';
             
             console.log('リセット完了');
         }
