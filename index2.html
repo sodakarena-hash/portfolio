@@ -570,6 +570,7 @@
             
             let meshCount = 0;
             let materialCount = 0;
+            const textureMap = new Map(); // テクスチャの重複チェック用
             
             character.traverse((child) => {
                 if (child.isMesh) {
@@ -583,11 +584,11 @@
                         if (Array.isArray(child.material)) {
                             child.material.forEach((material, index) => {
                                 materialCount++;
-                                analyzeMaterial(material, materialCount, child.name);
+                                analyzeMaterial(material, materialCount, child.name, textureMap);
                             });
                         } else {
                             materialCount++;
-                            analyzeMaterial(child.material, materialCount, child.name);
+                            analyzeMaterial(child.material, materialCount, child.name, textureMap);
                         }
                     } else {
                         console.log('  マテリアルなし');
@@ -600,62 +601,80 @@
             });
             
             console.log(`=== 解析完了: メッシュ${meshCount}個, マテリアル${materialCount}個 ===`);
-        }
-        
-        function analyzeMaterial(material, index, meshName) {
-            console.log(`  マテリアル ${index} (${material.name || 'Unnamed'})`);
-            console.log(`    opacity: ${material.opacity}, transparent: ${material.transparent}`);
-            console.log(`    color: ${material.color ? `rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})` : 'なし'}`);
             
-            // テクスチャの確認
-            const textures = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap'];
-            textures.forEach(texType => {
-                if (material[texType]) {
-                    console.log(`    ${texType}: ${material[texType].image ? '読み込み済み' : '未読み込み'} (${material[texType].image ? `${material[texType].image.width}x${material[texType].image.height}` : 'サイズ不明'})`);
-                    
-                    // テクスチャが読み込まれていない場合の対処
-                    if (!material[texType].image) {
-                        console.log(`      ${texType} の読み込みに問題があります`);
-                        // 基本的な色を設定
-                        if (texType === 'map' && !material.color) {
-                            material.color = new THREE.Color(0xffffff); // 白色をデフォルト
-                            console.log(`      デフォルト色を設定: 白`);
-                        }
-                    }
+            // テクスチャ共有の分析
+            console.log('=== テクスチャ共有分析 ===');
+            textureMap.forEach((materials, textureId) => {
+                if (materials.length > 1) {
+                    console.log(`❌ テクスチャ共有問題発見:`);
+                    console.log(`  テクスチャID: ${textureId}`);
+                    console.log(`  共有マテリアル: ${materials.join(', ')}`);
+                    console.log(`  → これが色混同の原因です`);
                 }
             });
+        }
+        
+        function analyzeMaterial(material, index, meshName, textureMap) {
+            console.log(`  マテリアル ${index} (${material.name || 'Unnamed'})`);
+            console.log(`    color: ${material.color ? `rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})` : 'なし'}`);
             
-            // マテリアル別の色補正（白色問題の対処）
-            const materialName = material.name?.toLowerCase() || '';
-            const meshNameLower = meshName?.toLowerCase() || '';
-            
-            if (material.color && (material.color.r === 1 && material.color.g === 1 && material.color.b === 1)) {
-                // 白色の場合、適切な色に変更
-                if (materialName.includes('髪') || materialName.includes('hair') || meshNameLower.includes('髪')) {
-                    // material.color = new THREE.Color(0x8B4513); // 茶色
-                    console.log(`    髪の毛マテリアル: テクスチャ優先で表示`);
+            // テクスチャの詳細確認とID記録
+            if (material.map && material.map.image) {
+                const texture = material.map;
+                const textureId = texture.uuid || texture.image.src || 'unknown';
+                const materialName = material.name || 'Unnamed';
+                
+                // テクスチャ共有の記録
+                if (!textureMap.has(textureId)) {
+                    textureMap.set(textureId, []);
+                }
+                textureMap.get(textureId).push(materialName);
+                
+                console.log(`    map: 存在 (${texture.image.width}x${texture.image.height})`);
+                console.log(`    テクスチャID: ${textureId.substring(0, 20)}...`);
+                
+                // UV座標の確認
+                if (texture.repeat) {
+                    console.log(`    UV repeat: ${texture.repeat.x}, ${texture.repeat.y}`);
+                }
+                if (texture.offset) {
+                    console.log(`    UV offset: ${texture.offset.x}, ${texture.offset.y}`);
+                }
+                
+                // テクスチャ設定の最適化
+                texture.encoding = THREE.sRGBEncoding;
+                texture.flipY = false;
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.needsUpdate = true;
+                
+            } else {
+                console.log(`    map: なし`);
+                
+                // テクスチャがない場合、マテリアル名に基づいて色を設定
+                const materialName = material.name?.toLowerCase() || '';
+                if (materialName.includes('髪') || materialName.includes('hair')) {
+                    material.color = new THREE.Color(0x8B4513); // 茶色
+                    console.log(`    代替色設定: 髪 → 茶色`);
                 } else if (materialName.includes('肌') || materialName.includes('skin')) {
-                    // material.color = new THREE.Color(0xFFDDBB); // 肌色
-                    console.log(`    肌マテリアル: テクスチャ優先で表示`);
+                    material.color = new THREE.Color(0xFFDDBB); // 肌色
+                    console.log(`    代替色設定: 肌 → 肌色`);
                 } else if (materialName.includes('上着') || materialName.includes('服')) {
-                    // material.color = new THREE.Color(0x4169E1); // 青色
-                    console.log(`    服マテリアル: テクスチャ優先で表示`);
+                    material.color = new THREE.Color(0x4169E1); // 青色
+                    console.log(`    代替色設定: 服 → 青色`);
+                } else if (materialName.includes('ズボン')) {
+                    material.color = new THREE.Color(0x000080); // 紺色
+                    console.log(`    代替色設定: ズボン → 紺色`);
+                } else if (materialName.includes('リボン')) {
+                    material.color = new THREE.Color(0xFF69B4); // ピンク
+                    console.log(`    代替色設定: リボン → ピンク`);
                 } else {
-                    console.log(`    白色マテリアル: ${materialName} - テクスチャ優先で表示`);
+                    material.color = new THREE.Color(0xCCCCCC); // グレー
+                    console.log(`    代替色設定: その他 → グレー`);
                 }
             }
             
-            // テクスチャ表示の最適化
-            if (material.map && material.map.image) {
-                // テクスチャがある場合、色の乗算を調整
-                material.color = new THREE.Color(1, 1, 1); // 白色でテクスチャをそのまま表示
-                material.map.encoding = THREE.sRGBEncoding;
-                material.map.flipY = false; // GLB用の設定
-                material.map.needsUpdate = true;
-                console.log(`    テクスチャ表示最適化完了`);
-            }
-            
-            // 強制的に全面表示設定（前と同じ）
+            // 強制的に全面表示設定
             material.side = THREE.DoubleSide;
             material.depthTest = true;
             material.alphaTest = 0.001;
