@@ -71,9 +71,86 @@
             font-size: 14px;
             z-index: 1000;
         }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            width: 300px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .control-group .value {
+            color: #4ecdc4;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
+    <div class="controls">
+        <h3 style="margin-top: 0; margin-bottom: 15px;">3Dモデル調整</h3>
+        
+        <div class="control-group">
+            <label>スケール（サイズ）</label>
+            <input type="range" id="scaleSlider" min="0.1" max="5" step="0.1" value="1">
+            <div class="value">値: <span id="scaleValue">1.0</span></div>
+        </div>
+
+        <div class="control-group">
+            <label>X位置（左右）</label>
+            <input type="range" id="posXSlider" min="-5" max="5" step="0.1" value="0">
+            <div class="value">値: <span id="posXValue">0.0</span></div>
+        </div>
+
+        <div class="control-group">
+            <label>Y位置（上下）</label>
+            <input type="range" id="posYSlider" min="-3" max="3" step="0.1" value="0">
+            <div class="value">値: <span id="posYValue">0.0</span></div>
+        </div>
+
+        <div class="control-group">
+            <label>Z位置（前後）</label>
+            <input type="range" id="posZSlider" min="-5" max="5" step="0.1" value="0">
+            <div class="value">値: <span id="posZValue">0.0</span></div>
+        </div>
+
+        <div class="control-group">
+            <label>カメラ距離</label>
+            <input type="range" id="cameraDistSlider" min="1" max="10" step="0.1" value="3">
+            <div class="value">値: <span id="cameraDistValue">3.0</span></div>
+        </div>
+
+        <div class="control-group">
+            <label>カメラ高さ</label>
+            <input type="range" id="cameraHeightSlider" min="0" max="5" step="0.1" value="1.6">
+            <div class="value">値: <span id="cameraHeightValue">1.6</span></div>
+        </div>
+
+        <button onclick="resetSettings()" style="background: #4ecdc4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px;">
+            リセット
+        </button>
+    </div>
+
     <div class="progress-bar" id="progressBar"></div>
     
     <div class="animation-info">
@@ -122,6 +199,8 @@
         let scene, camera, renderer, mixer, clock;
         let character = null;
         let animationAction = null;
+        let originalCharacterPosition = { x: 0, y: 0, z: 0 };
+        let originalCharacterScale = 1;
 
         function init() {
             // シーン作成
@@ -327,10 +406,104 @@
             
             // カメラの微妙な動き
             const time = clock.getElapsedTime();
-            camera.position.x = Math.sin(time * 0.1) * 0.1;
-            camera.position.y = 1.6 + Math.sin(time * 0.15) * 0.05;
+            const baseX = camera.userData.baseX || 0;
+            const baseY = camera.userData.baseY || 1.6;
+            const baseZ = camera.userData.baseZ || 3;
+            
+            camera.position.x = baseX + Math.sin(time * 0.1) * 0.1;
+            camera.position.y = baseY + Math.sin(time * 0.15) * 0.05;
             
             renderer.render(scene, camera);
+        }
+
+        // コントロール設定
+        function setupControls() {
+            const scaleSlider = document.getElementById('scaleSlider');
+            const posXSlider = document.getElementById('posXSlider');
+            const posYSlider = document.getElementById('posYSlider');
+            const posZSlider = document.getElementById('posZSlider');
+            const cameraDistSlider = document.getElementById('cameraDistSlider');
+            const cameraHeightSlider = document.getElementById('cameraHeightSlider');
+
+            // スケール調整
+            scaleSlider.addEventListener('input', (e) => {
+                const scale = parseFloat(e.target.value);
+                if (character) {
+                    character.scale.setScalar(scale);
+                }
+                document.getElementById('scaleValue').textContent = scale.toFixed(1);
+            });
+
+            // X位置調整
+            posXSlider.addEventListener('input', (e) => {
+                const posX = parseFloat(e.target.value);
+                if (character) {
+                    character.position.x = originalCharacterPosition.x + posX;
+                }
+                document.getElementById('posXValue').textContent = posX.toFixed(1);
+            });
+
+            // Y位置調整
+            posYSlider.addEventListener('input', (e) => {
+                const posY = parseFloat(e.target.value);
+                if (character) {
+                    character.position.y = originalCharacterPosition.y + posY;
+                }
+                document.getElementById('posYValue').textContent = posY.toFixed(1);
+            });
+
+            // Z位置調整
+            posZSlider.addEventListener('input', (e) => {
+                const posZ = parseFloat(e.target.value);
+                if (character) {
+                    character.position.z = originalCharacterPosition.z + posZ;
+                }
+                document.getElementById('posZValue').textContent = posZ.toFixed(1);
+            });
+
+            // カメラ距離調整
+            cameraDistSlider.addEventListener('input', (e) => {
+                const distance = parseFloat(e.target.value);
+                camera.position.z = distance;
+                camera.userData.baseZ = distance;
+                document.getElementById('cameraDistValue').textContent = distance.toFixed(1);
+            });
+
+            // カメラ高さ調整
+            cameraHeightSlider.addEventListener('input', (e) => {
+                const height = parseFloat(e.target.value);
+                camera.position.y = height;
+                camera.userData.baseY = height;
+                document.getElementById('cameraHeightValue').textContent = height.toFixed(1);
+            });
+        }
+
+        // リセット機能
+        function resetSettings() {
+            document.getElementById('scaleSlider').value = 1;
+            document.getElementById('posXSlider').value = 0;
+            document.getElementById('posYSlider').value = 0;
+            document.getElementById('posZSlider').value = 0;
+            document.getElementById('cameraDistSlider').value = 3;
+            document.getElementById('cameraHeightSlider').value = 1.6;
+
+            if (character) {
+                character.scale.setScalar(1);
+                character.position.set(originalCharacterPosition.x, originalCharacterPosition.y, originalCharacterPosition.z);
+            }
+
+            camera.position.set(0, 1.6, 3);
+            camera.userData.baseX = 0;
+            camera.userData.baseY = 1.6;
+            camera.userData.baseZ = 3;
+
+            // 値の表示も更新
+            document.getElementById('scaleValue').textContent = '1.0';
+            document.getElementById('posXValue').textContent = '0.0';
+            document.getElementById('posYValue').textContent = '0.0';
+            document.getElementById('posZValue').textContent = '0.0';
+            document.getElementById('cameraDistValue').textContent = '3.0';
+            document.getElementById('cameraHeightValue').textContent = '1.6';
         }
 
         // 初期化
