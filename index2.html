@@ -618,17 +618,20 @@
             console.log(`  マテリアル ${index} (${material.name || 'Unnamed'})`);
             console.log(`    color: ${material.color ? `rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})` : 'なし'}`);
             
+            const materialName = material.name?.toLowerCase() || '';
+            const originalColor = material.color ? material.color.clone() : null;
+            
             // テクスチャの詳細確認とID記録
             if (material.map && material.map.image) {
                 const texture = material.map;
                 const textureId = texture.uuid || texture.image.src || 'unknown';
-                const materialName = material.name || 'Unnamed';
+                const matName = material.name || 'Unnamed';
                 
                 // テクスチャ共有の記録
                 if (!textureMap.has(textureId)) {
                     textureMap.set(textureId, []);
                 }
-                textureMap.get(textureId).push(materialName);
+                textureMap.get(textureId).push(matName);
                 
                 console.log(`    map: 存在 (${texture.image.width}x${texture.image.height})`);
                 console.log(`    テクスチャID: ${textureId.substring(0, 20)}...`);
@@ -641,6 +644,20 @@
                     console.log(`    UV offset: ${texture.offset.x}, ${texture.offset.y}`);
                 }
                 
+                // 特定のマテリアルの色修正
+                if (materialName.includes('黒目') || materialName.includes('eye')) {
+                    // 黒目の場合、テクスチャを活かすために色を調整
+                    material.color = new THREE.Color(0.8, 0.8, 0.8); // 少しグレーにしてテクスチャを活かす
+                    console.log(`    黒目マテリアル: テクスチャを活かす色に調整`);
+                } else if (materialName.includes('肌') || materialName.includes('skin')) {
+                    // 肌の場合
+                    material.color = new THREE.Color(1.0, 0.95, 0.9); // わずかに肌色寄り
+                    console.log(`    肌マテリアル: 肌色寄りに調整`);
+                } else {
+                    // その他のテクスチャありマテリアルは白色でテクスチャをそのまま表示
+                    material.color = new THREE.Color(1, 1, 1);
+                }
+                
                 // テクスチャ設定の最適化
                 texture.encoding = THREE.sRGBEncoding;
                 texture.flipY = false;
@@ -651,26 +668,38 @@
             } else {
                 console.log(`    map: なし`);
                 
-                // テクスチャがない場合、マテリアル名に基づいて色を設定
-                const materialName = material.name?.toLowerCase() || '';
-                if (materialName.includes('髪') || materialName.includes('hair')) {
+                // テクスチャがない場合の色設定 - 元の色を優先
+                if (materialName.includes('輪郭') || materialName.includes('outline')) {
+                    // 輪郭線の場合、元の色を維持（赤色など）
+                    if (originalColor) {
+                        material.color = originalColor; // 元の色を維持
+                        console.log(`    輪郭マテリアル: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
+                    } else {
+                        material.color = new THREE.Color(0.5, 0.05, 0.05); // 暗い赤
+                        console.log(`    輪郭マテリアル: 暗い赤色を設定`);
+                    }
+                } else if (materialName.includes('髪') || materialName.includes('hair')) {
                     material.color = new THREE.Color(0x8B4513); // 茶色
-                    console.log(`    代替色設定: 髪 → 茶色`);
+                    console.log(`    髪マテリアル: 茶色を設定`);
                 } else if (materialName.includes('肌') || materialName.includes('skin')) {
                     material.color = new THREE.Color(0xFFDDBB); // 肌色
-                    console.log(`    代替色設定: 肌 → 肌色`);
+                    console.log(`    肌マテリアル: 肌色を設定`);
                 } else if (materialName.includes('上着') || materialName.includes('服')) {
                     material.color = new THREE.Color(0x4169E1); // 青色
-                    console.log(`    代替色設定: 服 → 青色`);
+                    console.log(`    服マテリアル: 青色を設定`);
                 } else if (materialName.includes('ズボン')) {
                     material.color = new THREE.Color(0x000080); // 紺色
-                    console.log(`    代替色設定: ズボン → 紺色`);
+                    console.log(`    ズボンマテリアル: 紺色を設定`);
                 } else if (materialName.includes('リボン')) {
                     material.color = new THREE.Color(0xFF69B4); // ピンク
-                    console.log(`    代替色設定: リボン → ピンク`);
+                    console.log(`    リボンマテリアル: ピンク色を設定`);
+                } else if (originalColor && (originalColor.r !== 1 || originalColor.g !== 1 || originalColor.b !== 1)) {
+                    // 元の色が白でない場合は、元の色を維持
+                    material.color = originalColor;
+                    console.log(`    その他マテリアル: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
                 } else {
                     material.color = new THREE.Color(0xCCCCCC); // グレー
-                    console.log(`    代替色設定: その他 → グレー`);
+                    console.log(`    その他マテリアル: グレーを設定`);
                 }
             }
             
