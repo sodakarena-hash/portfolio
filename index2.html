@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>3Dキャラ スクロール連動</title>
   <style>
-    body { margin: 0; height: 200vh; } /* スクロール領域 */
+    body { margin: 0; height: 200vh; background: black; }
     canvas { display: block; }
     #debug {
       position: fixed;
@@ -15,15 +15,16 @@
       padding: 5px 10px;
       font-size: 14px;
       border-radius: 5px;
+      z-index: 10;
     }
   </style>
   <!-- three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/build/three.min.js"></script>
   <!-- GLTFLoader -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
-  <!-- DRACOLoader（Draco圧縮に対応するため） -->
+  <!-- DRACOLoader（Draco圧縮対応） -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/DRACOLoader.js"></script>
-  <!-- lil-gui（カメラ調整用） -->
+  <!-- lil-gui -->
   <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.18"></script>
 </head>
 <body>
@@ -35,26 +36,28 @@
   <script>
     let scene, camera, renderer, model, mixer, animationAction;
     let scrollY = 0, targetScrollY = 0;
+    let gui;
 
     init();
     animate();
 
     function init() {
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x202020);
+      scene.background = new THREE.Color(0x000000); // 背景黒
 
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.set(0, 1.5, 5); // ← GUIで調整対象
+      camera.position.set(0, 1.5, 5); 
       camera.lookAt(0, 1, 0);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      const light = new THREE.DirectionalLight(0xffffff, 1);
+      // ライト
+      const light = new THREE.DirectionalLight(0xffffff, 0.7);
       light.position.set(5, 10, 7.5);
       scene.add(light);
-      scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+      scene.add(new THREE.AmbientLight(0xffffff, 0.2));
 
       // GLTFLoader + DRACOLoader
       const loader = new THREE.GLTFLoader();
@@ -64,14 +67,22 @@
 
       loader.load("models/iori.glb", (gltf) => {
         model = gltf.scene;
+
+        // デフォルトサイズ・位置
+        model.scale.set(1, 1, 1);
+        model.position.set(0, 0, 0);
+
         scene.add(model);
 
         mixer = new THREE.AnimationMixer(model);
         if (gltf.animations.length > 0) {
           animationAction = mixer.clipAction(gltf.animations[0]);
           animationAction.play();
-          animationAction.paused = true; // 自動再生しない
+          animationAction.paused = true;
         }
+
+        // GUI作成
+        setupGUI();
       });
 
       // スクロール監視
@@ -79,15 +90,29 @@
         targetScrollY = window.scrollY;
       });
 
-      // lil-guiでカメラ調整
-      const gui = new lil.GUI();
+      window.addEventListener("resize", onWindowResize);
+    }
+
+    function setupGUI() {
+      gui = new lil.GUI();
+
+      // カメラ調整
       const camFolder = gui.addFolder("Camera");
-      camFolder.add(camera.position, "x", -10, 10, 0.1);
-      camFolder.add(camera.position, "y", -10, 10, 0.1);
-      camFolder.add(camera.position, "z", -10, 10, 0.1);
+      camFolder.add(camera.position, "x", -10, 10, 0.1).name("posX");
+      camFolder.add(camera.position, "y", -10, 10, 0.1).name("posY");
+      camFolder.add(camera.position, "z", -10, 10, 0.1).name("posZ");
       camFolder.open();
 
-      window.addEventListener("resize", onWindowResize);
+      // モデル調整
+      const modelFolder = gui.addFolder("Model");
+      modelFolder.add(model.scale, "x", 0.1, 5, 0.1).name("scaleX");
+      modelFolder.add(model.scale, "y", 0.1, 5, 0.1).name("scaleY");
+      modelFolder.add(model.scale, "z", 0.1, 5, 0.1).name("scaleZ");
+      modelFolder.add(model.position, "x", -5, 5, 0.1).name("posX");
+      modelFolder.add(model.position, "y", -5, 5, 0.1).name("posY");
+      modelFolder.add(model.position, "z", -5, 5, 0.1).name("posZ");
+      modelFolder.add(model.rotation, "y", -Math.PI, Math.PI, 0.01).name("rotY");
+      modelFolder.open();
     }
 
     function onWindowResize() {
