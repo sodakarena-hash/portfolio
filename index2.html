@@ -231,7 +231,26 @@
                     character = gltf.scene;
                     scene.add(character);
 
-                    // アニメーションミキサーの設定
+                    // モデルのバウンディングボックスを計算
+                    const box = new THREE.Box3().setFromObject(character);
+                    const size = box.getSize(new THREE.Vector3());
+                    const center = box.getCenter(new THREE.Vector3());
+                    
+                    console.log('モデルサイズ:', size);
+                    console.log('モデル中心:', center);
+                    
+                    // 理想的なサイズ（高さ約2メートル）に自動調整
+                    const targetHeight = 2.0;
+                    const currentHeight = size.y;
+                    const scale = targetHeight / currentHeight;
+                    
+                    character.scale.setScalar(scale);
+                    console.log('適用されたスケール:', scale);
+                    
+                    // モデルを地面に配置
+                    character.position.x = -center.x * scale;
+                    character.position.y = -box.min.y * scale;
+                    character.position.z = -center.z * scale;
                     if (gltf.animations && gltf.animations.length > 0) {
                         console.log('アニメーション発見:', gltf.animations.length + '個');
                         mixer = new THREE.AnimationMixer(character);
@@ -249,6 +268,12 @@
                     character.position.y = 0;
                     
                     console.log('GLBモデルの設定完了');
+                    
+                    // カメラをモデルに合わせて調整
+                    const maxDim = Math.max(size.x, size.y, size.z) * scale;
+                    const cameraDistance = maxDim * 2;
+                    camera.position.set(0, targetHeight * 0.8, cameraDistance);
+                    camera.lookAt(0, targetHeight * 0.5, 0);
                 },
                 // 進行状況
                 (progress) => {
