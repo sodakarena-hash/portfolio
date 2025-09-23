@@ -124,8 +124,8 @@
 
         <div class="control-group">
             <label>Y位置（上下）</label>
-            <input type="range" id="posYSlider" min="-15" max="5" step="0.1" value="-8.8">
-            <div class="value">値: <span id="posYValue">-8.8</span></div>
+            <input type="range" id="posYSlider" min="-15" max="5" step="0.1" value="0">
+            <div class="value">値: <span id="posYValue">0.0</span></div>
         </div>
 
         <div class="control-group">
@@ -142,8 +142,8 @@
 
         <div class="control-group">
             <label>カメラX（左右）</label>
-            <input type="range" id="cameraXSlider" min="-10" max="10" step="0.1" value="3">
-            <div class="value">値: <span id="cameraXValue">3.0</span></div>
+            <input type="range" id="cameraXSlider" min="-10" max="10" step="0.1" value="0">
+            <div class="value">値: <span id="cameraXValue">0.0</span></div>
         </div>
 
         <div class="control-group">
@@ -154,8 +154,8 @@
 
         <div class="control-group">
             <label>カメラ高さ</label>
-            <input type="range" id="cameraHeightSlider" min="-15" max="5" step="0.1" value="-8.8">
-            <div class="value">値: <span id="cameraHeightValue">-8.8</span></div>
+            <input type="range" id="cameraHeightSlider" min="-15" max="5" step="0.1" value="1">
+            <div class="value">値: <span id="cameraHeightValue">1.0</span></div>
         </div>
 
         <button onclick="resetSettings()" style="background: #4ecdc4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px;">
@@ -169,6 +169,11 @@
         <div>スクロール進行度: <span id="scrollProgress">0%</span></div>
         <div>アニメーション時間: <span id="animationTime">0.00</span></div>
         <div>フレーム: <span id="currentFrame">0 / 24</span></div>
+        <div style="border-top: 1px solid #444; margin-top: 10px; padding-top: 10px;">
+            <div>カメラ位置: <span id="cameraPos">-</span></div>
+            <div>3D位置: <span id="modelPos">-</span></div>
+            <div>カメラ向き: <span id="cameraTarget">-</span></div>
+        </div>
     </div>
 
     <div id="threejs-container"></div>
@@ -219,10 +224,10 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000000, 0); // 透明背景
 
-            // カメラ設定 - FOVを小さくしてパース感を抑制
-            camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.001, 10000);
-            camera.position.set(3, -8.8, 8); // X=3で右寄り、Y=-8.8で下、Z=8で距離
-            camera.lookAt(0, -8.8, 0); // 3Dモデルの位置を見る
+            // カメラ設定 - 一時的に安全な値で表示確認
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.001, 10000);
+            camera.position.set(0, 1, 8); // 安全な位置で確認
+            camera.lookAt(0, 0, 0); // 中央を見る
 
             // レンダラー設定
             renderer = new THREE.WebGLRenderer({ 
@@ -432,12 +437,25 @@
             
             // カメラの微妙な動き
             const time = clock.getElapsedTime();
-            const baseX = camera.userData.baseX || 0;
-            const baseY = camera.userData.baseY || 1.6;
-            const baseZ = camera.userData.baseZ || 3;
+            const baseX = camera.userData.baseX || 3;
+            const baseY = camera.userData.baseY || -8.8;
+            const baseZ = camera.userData.baseZ || 8;
             
             camera.position.x = baseX + Math.sin(time * 0.1) * 0.1;
             camera.position.y = baseY + Math.sin(time * 0.15) * 0.05;
+            
+            // デバッグ情報の更新
+            document.getElementById('cameraPos').textContent = 
+                `(${camera.position.x.toFixed(1)}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)})`;
+            
+            if (character) {
+                document.getElementById('modelPos').textContent = 
+                    `(${character.position.x.toFixed(1)}, ${character.position.y.toFixed(1)}, ${character.position.z.toFixed(1)})`;
+            } else {
+                document.getElementById('modelPos').textContent = 'モデル未読み込み';
+            }
+            
+            document.getElementById('cameraTarget').textContent = `Y=${camera.userData.baseY || -8.8}を向いている`;
             
             // 手動でクリアしてからレンダリング
             renderer.clear();
@@ -446,10 +464,10 @@
 
         // コントロール設定
         function setupControls() {
-            // カメラの初期設定（新しい値に更新）
+            // カメラの初期設定（安全な値に一時的に戻す）
             camera.userData = {
-                baseX: 3,
-                baseY: -8.8,
+                baseX: 0,
+                baseY: 1,
                 baseZ: 8
             };
             
@@ -462,7 +480,18 @@
             const cameraDistSlider = document.getElementById('cameraDistSlider');
             const cameraHeightSlider = document.getElementById('cameraHeightSlider');
 
-            // スケール調整
+            // カメラ高さ調整（lookAtも更新）
+            cameraHeightSlider.addEventListener('input', (e) => {
+                const height = parseFloat(e.target.value);
+                console.log('カメラ高さ変更:', height);
+                camera.position.y = height;
+                camera.userData.baseY = height;
+                // カメラの視線も更新
+                camera.lookAt(0, height - 1, 0); // 少し下を見る
+                document.getElementById('cameraHeightValue').textContent = height.toFixed(1);
+            });
+
+            // その他のイベントリスナーは同じ
             scaleSlider.addEventListener('input', (e) => {
                 const scale = parseFloat(e.target.value);
                 console.log('スケール変更:', scale);
@@ -472,7 +501,6 @@
                 document.getElementById('scaleValue').textContent = scale.toFixed(2);
             });
 
-            // X位置調整
             posXSlider.addEventListener('input', (e) => {
                 const posX = parseFloat(e.target.value);
                 console.log('X位置変更:', posX);
@@ -482,7 +510,6 @@
                 document.getElementById('posXValue').textContent = posX.toFixed(1);
             });
 
-            // Y位置調整
             posYSlider.addEventListener('input', (e) => {
                 const posY = parseFloat(e.target.value);
                 console.log('Y位置変更:', posY);
@@ -492,7 +519,6 @@
                 document.getElementById('posYValue').textContent = posY.toFixed(1);
             });
 
-            // Z位置調整
             posZSlider.addEventListener('input', (e) => {
                 const posZ = parseFloat(e.target.value);
                 console.log('Z位置変更:', posZ);
@@ -502,17 +528,15 @@
                 document.getElementById('posZValue').textContent = posZ.toFixed(1);
             });
 
-            // Y回転調整（向き）
             rotYSlider.addEventListener('input', (e) => {
                 const rotY = parseFloat(e.target.value);
                 console.log('Y回転変更:', rotY);
                 if (character) {
-                    character.rotation.y = (rotY * Math.PI) / 180; // 度をラジアンに変換
+                    character.rotation.y = (rotY * Math.PI) / 180;
                 }
                 document.getElementById('rotYValue').textContent = rotY.toFixed(0) + '°';
             });
 
-            // カメラX位置調整（NEW）
             cameraXSlider.addEventListener('input', (e) => {
                 const cameraX = parseFloat(e.target.value);
                 console.log('カメラX変更:', cameraX);
@@ -521,24 +545,12 @@
                 document.getElementById('cameraXValue').textContent = cameraX.toFixed(1);
             });
 
-            // カメラ距離調整
             cameraDistSlider.addEventListener('input', (e) => {
                 const distance = parseFloat(e.target.value);
                 console.log('カメラ距離変更:', distance);
                 camera.position.z = distance;
                 camera.userData.baseZ = distance;
                 document.getElementById('cameraDistValue').textContent = distance.toFixed(1);
-            });
-
-            // カメラ高さ調整
-            cameraHeightSlider.addEventListener('input', (e) => {
-                const height = parseFloat(e.target.value);
-                console.log('カメラ高さ変更:', height);
-                camera.position.y = height;
-                camera.userData.baseY = height;
-                // カメラの視線も更新
-                camera.lookAt(0, height, 0);
-                document.getElementById('cameraHeightValue').textContent = height.toFixed(1);
             });
             
             console.log('コントロール設定完了');
@@ -550,35 +562,35 @@
             
             document.getElementById('scaleSlider').value = 0.1;
             document.getElementById('posXSlider').value = 0;
-            document.getElementById('posYSlider').value = -8.8;
+            document.getElementById('posYSlider').value = 0;
             document.getElementById('posZSlider').value = 0;
             document.getElementById('rotYSlider').value = 180;
-            document.getElementById('cameraXSlider').value = 3;
+            document.getElementById('cameraXSlider').value = 0;
             document.getElementById('cameraDistSlider').value = 8;
-            document.getElementById('cameraHeightSlider').value = -8.8;
+            document.getElementById('cameraHeightSlider').value = 1;
 
             if (character) {
                 character.scale.setScalar(0.1);
-                character.position.set(originalCharacterPosition.x, originalCharacterPosition.y - 8.8, originalCharacterPosition.z);
+                character.position.set(originalCharacterPosition.x, originalCharacterPosition.y, originalCharacterPosition.z);
                 character.rotation.y = Math.PI; // 180度回転（後ろ向き）
                 console.log('キャラクター位置リセット完了');
             }
 
-            camera.position.set(3, -8.8, 8);
-            camera.lookAt(0, -8.8, 0);
-            camera.userData.baseX = 3;
-            camera.userData.baseY = -8.8;
+            camera.position.set(0, 1, 8);
+            camera.lookAt(0, 0, 0);
+            camera.userData.baseX = 0;
+            camera.userData.baseY = 1;
             camera.userData.baseZ = 8;
 
             // 値の表示も更新
             document.getElementById('scaleValue').textContent = '0.1';
             document.getElementById('posXValue').textContent = '0.0';
-            document.getElementById('posYValue').textContent = '-8.8';
+            document.getElementById('posYValue').textContent = '0.0';
             document.getElementById('posZValue').textContent = '0.0';
             document.getElementById('rotYValue').textContent = '180°';
-            document.getElementById('cameraXValue').textContent = '3.0';
+            document.getElementById('cameraXValue').textContent = '0.0';
             document.getElementById('cameraDistValue').textContent = '8.0';
-            document.getElementById('cameraHeightValue').textContent = '-8.8';
+            document.getElementById('cameraHeightValue').textContent = '1.0';
             
             console.log('リセット完了');
         }
