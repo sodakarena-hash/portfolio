@@ -433,6 +433,8 @@
             camera.position.x = baseX + Math.sin(time * 0.1) * 0.1;
             camera.position.y = baseY + Math.sin(time * 0.15) * 0.05;
             
+            // 手動でクリアしてからレンダリング
+            renderer.clear();
             renderer.render(scene, camera);
         }
 
@@ -624,7 +626,7 @@
             const meshNameLower = meshName?.toLowerCase() || '';
             const originalColor = material.color ? material.color.clone() : null;
             
-            // 輪郭線判定を強化（マテリアル名とメッシュ名の両方を確認）
+            // 輪郭線判定を強化（より厳密に）
             const isOutline = materialName.includes('輪郭') || 
                             materialName.includes('outline') || 
                             materialName.includes('rim') ||
@@ -634,34 +636,35 @@
                             meshNameLower.includes('outline') ||
                             meshNameLower.includes('rim') ||
                             meshNameLower.includes('line') ||
-                            meshNameLower.includes('edge') ||
-                            // 背面描画の判定も追加
-                            (material.side === THREE.BackSide) ||
-                            // 色が暗い場合も輪郭線の可能性
-                            (originalColor && originalColor.r < 0.3 && originalColor.g < 0.3 && originalColor.b < 0.3);
+                            meshNameLower.includes('edge');
             
-            console.log(`    輪郭線判定: ${isOutline} (side: ${material.side}, color: ${originalColor ? `rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})` : 'なし'})`);
+            console.log(`    輪郭線判定: ${isOutline}`);
             
-            // 輪郭線マテリアルを優先的に処理
+            // 輪郭線マテリアルの処理
             if (isOutline) {
-                // 輪郭線マテリアル処理
-                console.log(`    輪郭線マテリアル処理開始`);
+                console.log(`    🔥 輪郭線マテリアル処理開始`);
                 
-                // 輪郭線の色設定（元の暗い色を維持または新たに設定）
-                if (originalColor && (originalColor.r < 0.5 || originalColor.g < 0.5 || originalColor.b < 0.5)) {
+                // 輪郭線の色設定（赤系の輪郭線）
+                if (originalColor && (originalColor.r > 0.3 && originalColor.g < 0.3 && originalColor.b < 0.3)) {
+                    // 元の色が赤系の場合はそれを維持
+                    material.color = originalColor.clone();
+                    console.log(`    輪郭線: 元の赤色を維持 rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
+                } else if (originalColor && (originalColor.r < 0.5 || originalColor.g < 0.5 || originalColor.b < 0.5)) {
                     // 元の色が暗い場合はそれを維持
                     material.color = originalColor.clone();
                     console.log(`    輪郭線: 元の暗い色を維持 rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
                 } else {
-                    // 明るい色の場合は暗い色を設定
-                    material.color = new THREE.Color(0.1, 0.1, 0.1); // 濃いグレー
-                    console.log(`    輪郭線: 濃いグレーを設定`);
+                    // その他の場合は黒い輪郭線に設定
+                    material.color = new THREE.Color(0.0, 0.0, 0.0); // 完全な黒
+                    console.log(`    輪郭線: 黒色を設定`);
                 }
                 
-                // 輪郭線用の特別設定
+                // 【重要】背面法のための設定
                 material.side = THREE.BackSide; // 背面のみ描画
-                material.depthWrite = false; // 深度書き込みを無効
-                material.depthTest = true; // 深度テストは有効
+                material.depthWrite = true; // 深度書き込みを有効にしてZ-fighting防止
+                material.depthTest = true; // 深度テストも有効
+                material.transparent = false; // 輪郭線は不透明
+                material.alphaTest = 0; // アルファテスト無効
                 
                 // テクスチャを無効化（輪郭線には不要）
                 if (material.map) {
@@ -669,8 +672,10 @@
                     console.log(`    輪郭線: テクスチャを無効化`);
                 }
                 
+                console.log(`    ✅ 輪郭線設定完了: BackSide, 黒色, 深度有効`);
+                
             } else if (material.map && material.map.image) {
-                // テクスチャがあり、輪郭線でない場合
+                // テクスチャがあり、輪郭線でない場合（元のコードを維持）
                 const texture = material.map;
                 const textureId = texture.uuid || texture.image.src || 'unknown';
                 const matName = material.name || 'Unnamed';
@@ -709,7 +714,7 @@
                 material.depthTest = true;
                 
             } else {
-                // テクスチャなしの通常マテリアル
+                // テクスチャなしの通常マテリアル（元のコードを維持）
                 console.log(`    テクスチャなしマテリアル`);
                 
                 if (materialName.includes('髪') || materialName.includes('hair')) {
@@ -734,10 +739,12 @@
                 material.depthTest = true;
             }
             
-            // 共通設定
-            material.alphaTest = 0.001;
-            if (material.opacity < 0.99) {
-                material.transparent = true;
+            // 共通設定（輪郭線以外）
+            if (!isOutline) {
+                material.alphaTest = 0.001;
+                if (material.opacity < 0.99) {
+                    material.transparent = true;
+                }
             }
             
             material.needsUpdate = true;
@@ -748,8 +755,8 @@
         // 初期化
         init();
 
-        // GLBファイルを読み込む場合は以下のコメントアウトを解除
-         loadGLBModel('models/iori.glb');
+        // GLBファイルを読み込む
+        loadGLBModel('models/iori.glb');
     </script>
 </body>
 </html>
