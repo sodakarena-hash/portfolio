@@ -644,19 +644,9 @@
                     console.log(`    UV offset: ${texture.offset.x}, ${texture.offset.y}`);
                 }
                 
-                // 特定のマテリアルの色修正
-                if (materialName.includes('黒目') || materialName.includes('eye')) {
-                    // 黒目の場合、テクスチャを活かすために色を調整
-                    material.color = new THREE.Color(0.8, 0.8, 0.8); // 少しグレーにしてテクスチャを活かす
-                    console.log(`    黒目マテリアル: テクスチャを活かす色に調整`);
-                } else if (materialName.includes('肌') || materialName.includes('skin')) {
-                    // 肌の場合
-                    material.color = new THREE.Color(1.0, 0.95, 0.9); // わずかに肌色寄り
-                    console.log(`    肌マテリアル: 肌色寄りに調整`);
-                } else {
-                    // その他のテクスチャありマテリアルは白色でテクスチャをそのまま表示
-                    material.color = new THREE.Color(1, 1, 1);
-                }
+                // 【重要】テクスチャがあるマテリアルは必ず白色に設定
+                material.color = new THREE.Color(1, 1, 1); // 白色でテクスチャをそのまま表示
+                console.log(`    テクスチャあり: 色を白に設定してテクスチャを正常表示`);
                 
                 // テクスチャ設定の最適化
                 texture.encoding = THREE.sRGBEncoding;
@@ -668,51 +658,55 @@
             } else {
                 console.log(`    map: なし`);
                 
-                // テクスチャがない場合の色設定 - 元の色を優先
+                // テクスチャがない場合のみ色設定を行う
                 if (materialName.includes('輪郭') || materialName.includes('outline')) {
-                    // 輪郭線の場合、元の色を維持（赤色など）
-                    if (originalColor) {
+                    // 輪郭線の場合、元の色を維持（背面法用）
+                    if (originalColor && originalColor.r < 0.9) { // 元の色が白でない場合
                         material.color = originalColor; // 元の色を維持
-                        console.log(`    輪郭マテリアル: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
+                        console.log(`    輪郭線: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
                     } else {
-                        material.color = new THREE.Color(0.5, 0.05, 0.05); // 暗い赤
-                        console.log(`    輪郭マテリアル: 暗い赤色を設定`);
+                        // 元の色がない、または白い場合は赤い輪郭線に設定
+                        material.color = new THREE.Color(0.7, 0.05, 0.05); // 赤い輪郭線
+                        console.log(`    輪郭線: 赤色を設定`);
                     }
-                } else if (materialName.includes('髪') || materialName.includes('hair')) {
-                    material.color = new THREE.Color(0x8B4513); // 茶色
-                    console.log(`    髪マテリアル: 茶色を設定`);
-                } else if (materialName.includes('肌') || materialName.includes('skin')) {
-                    material.color = new THREE.Color(0xFFDDBB); // 肌色
-                    console.log(`    肌マテリアル: 肌色を設定`);
-                } else if (materialName.includes('上着') || materialName.includes('服')) {
-                    material.color = new THREE.Color(0x4169E1); // 青色
-                    console.log(`    服マテリアル: 青色を設定`);
-                } else if (materialName.includes('ズボン')) {
-                    material.color = new THREE.Color(0x000080); // 紺色
-                    console.log(`    ズボンマテリアル: 紺色を設定`);
-                } else if (materialName.includes('リボン')) {
-                    material.color = new THREE.Color(0xFF69B4); // ピンク
-                    console.log(`    リボンマテリアル: ピンク色を設定`);
-                } else if (originalColor && (originalColor.r !== 1 || originalColor.g !== 1 || originalColor.b !== 1)) {
-                    // 元の色が白でない場合は、元の色を維持
-                    material.color = originalColor;
-                    console.log(`    その他マテリアル: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
+                    
+                    // 輪郭線用の特別設定
+                    material.side = THREE.BackSide; // 背面のみ描画
+                    material.depthWrite = false; // 深度書き込みを無効にして輪郭線を背後に
+                    
                 } else {
-                    material.color = new THREE.Color(0xCCCCCC); // グレー
-                    console.log(`    その他マテリアル: グレーを設定`);
+                    // その他のテクスチャなしマテリアル
+                    if (materialName.includes('髪') || materialName.includes('hair')) {
+                        material.color = new THREE.Color(0x8B4513); // 茶色
+                        console.log(`    髪（テクスチャなし）: 茶色を設定`);
+                    } else if (materialName.includes('肌') || materialName.includes('skin')) {
+                        material.color = new THREE.Color(0xFFDDBB); // 肌色
+                        console.log(`    肌（テクスチャなし）: 肌色を設定`);
+                    } else if (originalColor && (originalColor.r !== 1 || originalColor.g !== 1 || originalColor.b !== 1)) {
+                        // 元の色が白でない場合は、元の色を維持
+                        material.color = originalColor;
+                        console.log(`    その他: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
+                    } else {
+                        material.color = new THREE.Color(0xCCCCCC); // グレー
+                        console.log(`    その他: グレーを設定`);
+                    }
+                    
+                    // 通常マテリアル設定
+                    material.side = THREE.DoubleSide;
+                    material.depthWrite = true;
                 }
             }
             
-            // 強制的に全面表示設定
-            material.side = THREE.DoubleSide;
+            // 共通設定
             material.depthTest = true;
             material.alphaTest = 0.001;
             if (material.opacity < 0.99) {
                 material.transparent = true;
-                material.depthWrite = false;
-            } else {
-                material.depthWrite = true;
+                if (material.side !== THREE.BackSide) { // 輪郭線以外
+                    material.depthWrite = false;
+                }
             }
+            
             material.needsUpdate = true;
         }
 
