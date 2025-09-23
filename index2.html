@@ -17,8 +17,13 @@
       border-radius: 5px;
     }
   </style>
+  <!-- three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/build/three.min.js"></script>
+  <!-- GLTFLoader -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- DRACOLoader（Draco圧縮に対応するため） -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/DRACOLoader.js"></script>
+  <!-- lil-gui（カメラ調整用） -->
   <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.18"></script>
 </head>
 <body>
@@ -51,8 +56,12 @@
       scene.add(light);
       scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
-      // モデル読み込み
+      // GLTFLoader + DRACOLoader
       const loader = new THREE.GLTFLoader();
+      const dracoLoader = new THREE.DRACOLoader();
+      dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.4.3/");
+      loader.setDRACOLoader(dracoLoader);
+
       loader.load("models/iori.glb", (gltf) => {
         model = gltf.scene;
         scene.add(model);
