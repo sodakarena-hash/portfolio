@@ -142,8 +142,8 @@
 
         <div class="control-group">
             <label>カメラX（左右）</label>
-            <input type="range" id="cameraXSlider" min="-10" max="10" step="0.1" value="0">
-            <div class="value">値: <span id="cameraXValue">0.0</span></div>
+            <input type="range" id="cameraXSlider" min="-10" max="10" step="0.1" value="-2">
+            <div class="value">値: <span id="cameraXValue">-2.0</span></div>
         </div>
 
         <div class="control-group">
@@ -154,6 +154,9 @@
 
         <div class="control-group">
             <label>カメラ高さ</label>
+            <input type="range" id="cameraHeightSlider" min="-5" max="10" step="0.1" value="3">
+            <div class="value">値: <span id="cameraHeightValue">3.0</span></div>
+        </div><label>カメラ高さ</label>
             <input type="range" id="cameraHeightSlider" min="-15" max="5" step="0.1" value="1">
             <div class="value">値: <span id="cameraHeightValue">1.0</span></div>
         </div>
@@ -224,10 +227,10 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000000, 0); // 透明背景
 
-            // カメラ設定 - 一時的に安全な値で表示確認
+            // カメラ設定 - 左寄り・高い位置に調整
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.001, 10000);
-            camera.position.set(0, 1, 8); // 安全な位置で確認
-            camera.lookAt(0, 0, 0); // 中央を見る
+            camera.position.set(-2, 3, 8); // X=-2で左寄り、Y=3で高く
+            camera.lookAt(0, 1, 0); // キャラクターの中央付近を見る
 
             // レンダラー設定
             renderer = new THREE.WebGLRenderer({ 
@@ -464,10 +467,10 @@
 
         // コントロール設定
         function setupControls() {
-            // カメラの初期設定（安全な値に一時的に戻す）
+            // カメラの初期設定（左寄り・高い位置）
             camera.userData = {
-                baseX: 0,
-                baseY: 1,
+                baseX: -2,
+                baseY: 3,
                 baseZ: 8
             };
             
@@ -486,8 +489,8 @@
                 console.log('カメラ高さ変更:', height);
                 camera.position.y = height;
                 camera.userData.baseY = height;
-                // カメラの視線も更新
-                camera.lookAt(0, height - 1, 0); // 少し下を見る
+                // カメラの視線も更新（キャラクターの中央を見る）
+                camera.lookAt(0, 1, 0); 
                 document.getElementById('cameraHeightValue').textContent = height.toFixed(1);
             });
 
@@ -565,9 +568,9 @@
             document.getElementById('posYSlider').value = 0;
             document.getElementById('posZSlider').value = 0;
             document.getElementById('rotYSlider').value = 180;
-            document.getElementById('cameraXSlider').value = 0;
+            document.getElementById('cameraXSlider').value = -2;
             document.getElementById('cameraDistSlider').value = 8;
-            document.getElementById('cameraHeightSlider').value = 1;
+            document.getElementById('cameraHeightSlider').value = 3;
 
             if (character) {
                 character.scale.setScalar(0.1);
@@ -576,10 +579,10 @@
                 console.log('キャラクター位置リセット完了');
             }
 
-            camera.position.set(0, 1, 8);
-            camera.lookAt(0, 0, 0);
-            camera.userData.baseX = 0;
-            camera.userData.baseY = 1;
+            camera.position.set(-2, 3, 8);
+            camera.lookAt(0, 1, 0);
+            camera.userData.baseX = -2;
+            camera.userData.baseY = 3;
             camera.userData.baseZ = 8;
 
             // 値の表示も更新
@@ -588,9 +591,9 @@
             document.getElementById('posYValue').textContent = '0.0';
             document.getElementById('posZValue').textContent = '0.0';
             document.getElementById('rotYValue').textContent = '180°';
-            document.getElementById('cameraXValue').textContent = '0.0';
+            document.getElementById('cameraXValue').textContent = '-2.0';
             document.getElementById('cameraDistValue').textContent = '8.0';
-            document.getElementById('cameraHeightValue').textContent = '1.0';
+            document.getElementById('cameraHeightValue').textContent = '3.0';
             
             console.log('リセット完了');
         }
