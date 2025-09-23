@@ -222,7 +222,8 @@
             renderer = new THREE.WebGLRenderer({ 
                 antialias: true, 
                 alpha: true,
-                preserveDrawingBuffer: true
+                preserveDrawingBuffer: true,
+                logarithmicDepthBuffer: true // 深度バッファの精度向上
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
@@ -230,6 +231,7 @@
             renderer.outputEncoding = THREE.sRGBEncoding;
             renderer.sortObjects = true; // 描画順序を適切に処理
             renderer.setClearColor(0x000000, 0); // 透明背景
+            renderer.autoClear = false; // 手動クリア制御
             
             document.getElementById('threejs-container').appendChild(renderer.domElement);
 
@@ -359,6 +361,11 @@
                     character.position.y = 0;
                     
                     console.log('GLBモデルの設定完了');
+                    
+                    // 強制的にモデル解析を実行
+                    setTimeout(() => {
+                        analyzeModel();
+                    }, 1000);
                     
                     // カメラをモデルに合わせて調整
                     const maxDim = Math.max(size.x, size.y, size.z) * scale;
@@ -550,6 +557,96 @@
             document.getElementById('cameraHeightValue').textContent = '2.0';
             
             console.log('リセット完了');
+        }
+
+        // モデル詳細解析関数
+        function analyzeModel() {
+            if (!character) {
+                console.log('キャラクターがまだ読み込まれていません');
+                return;
+            }
+            
+            console.log('=== 詳細モデル解析開始 ===');
+            
+            let meshCount = 0;
+            let materialCount = 0;
+            
+            character.traverse((child) => {
+                if (child.isMesh) {
+                    meshCount++;
+                    
+                    console.log(`メッシュ ${meshCount}:`, {
+                        name: child.name || 'Unnamed',
+                        visible: child.visible,
+                        vertices: child.geometry ? child.geometry.attributes.position?.count : 0,
+                        hasUV: child.geometry ? !!child.geometry.attributes.uv : false,
+                        scale: `${child.scale.x.toFixed(3)}, ${child.scale.y.toFixed(3)}, ${child.scale.z.toFixed(3)}`,
+                        position: `${child.position.x.toFixed(3)}, ${child.position.y.toFixed(3)}, ${child.position.z.toFixed(3)}`
+                    });
+                    
+                    // マテリアル情報
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach((material, index) => {
+                                materialCount++;
+                                console.log(`  マテリアル ${materialCount}:`, {
+                                    name: material.name || 'Unnamed',
+                                    opacity: material.opacity,
+                                    transparent: material.transparent,
+                                    side: material.side === THREE.DoubleSide ? 'DoubleSide' : 
+                                          material.side === THREE.FrontSide ? 'FrontSide' : 'BackSide',
+                                    depthWrite: material.depthWrite,
+                                    depthTest: material.depthTest
+                                });
+                                
+                                // 強制的に全面表示設定
+                                material.side = THREE.DoubleSide;
+                                material.depthTest = true;
+                                material.alphaTest = 0.001;
+                                if (material.opacity < 0.99) {
+                                    material.transparent = true;
+                                    material.depthWrite = false;
+                                } else {
+                                    material.depthWrite = true;
+                                }
+                                material.needsUpdate = true;
+                            });
+                        } else {
+                            materialCount++;
+                            console.log(`  マテリアル ${materialCount}:`, {
+                                name: child.material.name || 'Unnamed',
+                                opacity: child.material.opacity,
+                                transparent: child.material.transparent,
+                                side: child.material.side === THREE.DoubleSide ? 'DoubleSide' : 
+                                      child.material.side === THREE.FrontSide ? 'FrontSide' : 'BackSide',
+                                depthWrite: child.material.depthWrite,
+                                depthTest: child.material.depthTest
+                            });
+                            
+                            // 強制的に全面表示設定
+                            child.material.side = THREE.DoubleSide;
+                            child.material.depthTest = true;
+                            child.material.alphaTest = 0.001;
+                            if (child.material.opacity < 0.99) {
+                                child.material.transparent = true;
+                                child.material.depthWrite = false;
+                            } else {
+                                child.material.depthWrite = true;
+                            }
+                            child.material.needsUpdate = true;
+                        }
+                    } else {
+                        console.log('  マテリアルなし');
+                    }
+                    
+                    // 強制的に可視化
+                    child.visible = true;
+                    child.frustumCulled = false;
+                }
+            });
+            
+            console.log(`=== 解析完了: メッシュ${meshCount}個, マテリアル${materialCount}個 ===`);
+            console.log('全マテリアルを両面描画に強制設定しました');
         }
 
         // 初期化
