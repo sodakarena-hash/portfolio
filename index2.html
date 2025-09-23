@@ -625,6 +625,36 @@
                 }
             });
             
+            // マテリアル別の色補正（白色問題の対処）
+            const materialName = material.name?.toLowerCase() || '';
+            const meshNameLower = meshName?.toLowerCase() || '';
+            
+            if (material.color && (material.color.r === 1 && material.color.g === 1 && material.color.b === 1)) {
+                // 白色の場合、適切な色に変更
+                if (materialName.includes('髪') || materialName.includes('hair') || meshNameLower.includes('髪')) {
+                    // material.color = new THREE.Color(0x8B4513); // 茶色
+                    console.log(`    髪の毛マテリアル: テクスチャ優先で表示`);
+                } else if (materialName.includes('肌') || materialName.includes('skin')) {
+                    // material.color = new THREE.Color(0xFFDDBB); // 肌色
+                    console.log(`    肌マテリアル: テクスチャ優先で表示`);
+                } else if (materialName.includes('上着') || materialName.includes('服')) {
+                    // material.color = new THREE.Color(0x4169E1); // 青色
+                    console.log(`    服マテリアル: テクスチャ優先で表示`);
+                } else {
+                    console.log(`    白色マテリアル: ${materialName} - テクスチャ優先で表示`);
+                }
+            }
+            
+            // テクスチャ表示の最適化
+            if (material.map && material.map.image) {
+                // テクスチャがある場合、色の乗算を調整
+                material.color = new THREE.Color(1, 1, 1); // 白色でテクスチャをそのまま表示
+                material.map.encoding = THREE.sRGBEncoding;
+                material.map.flipY = false; // GLB用の設定
+                material.map.needsUpdate = true;
+                console.log(`    テクスチャ表示最適化完了`);
+            }
+            
             // 強制的に全面表示設定（前と同じ）
             material.side = THREE.DoubleSide;
             material.depthTest = true;
