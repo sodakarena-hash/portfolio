@@ -154,8 +154,8 @@
 
         <div class="control-group">
             <label>カメラ高さ</label>
-            <input type="range" id="cameraHeightSlider" min="-5" max="20" step="0.1" value="10">
-            <div class="value">値: <span id="cameraHeightValue">10.0</span></div>
+            <input type="range" id="cameraHeightSlider" min="-5" max="25" step="0.1" value="15">
+            <div class="value">値: <span id="cameraHeightValue">15.0</span></div>
         </div><label>カメラ高さ</label>
             <input type="range" id="cameraHeightSlider" min="-15" max="5" step="0.1" value="1">
             <div class="value">値: <span id="cameraHeightValue">1.0</span></div>
@@ -215,10 +215,10 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000000, 0); // 透明背景
 
-            // カメラ設定 - もっと高い位置に
+            // カメラ設定 - かなり高い位置に
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.001, 10000);
-            camera.position.set(-2, 10, 8); // Y=10でかなり高い位置
-            camera.lookAt(0, 0, 0); // 地面付近を見下ろす
+            camera.position.set(-2, 15, 8); // Y=15でかなり高い位置
+            camera.lookAt(0, -2, 0); // 下を見下ろす
 
             // レンダラー設定
             renderer = new THREE.WebGLRenderer({ 
@@ -334,18 +334,15 @@
                     console.log('モデルサイズ:', size);
                     console.log('モデル中心:', center);
                     
-                    // 理想的なサイズ（高さ約2メートル）に自動調整
-                    const targetHeight = 2.0;
-                    const currentHeight = size.y;
-                    const scale = targetHeight / currentHeight;
-                    
-                    character.scale.setScalar(scale);
-                    console.log('適用されたスケール:', scale);
+                    // 自動スケーリングを無効化し、極小サイズを直接適用
+                    const smallScale = 0.01; // 非常に小さいスケール
+                    character.scale.setScalar(smallScale);
+                    console.log('強制適用スケール:', smallScale);
                     
                     // モデルを地面に配置
-                    character.position.x = -center.x * scale;
-                    character.position.y = -box.min.y * scale;
-                    character.position.z = -center.z * scale;
+                    character.position.x = -center.x * smallScale;
+                    character.position.y = -box.min.y * smallScale;
+                    character.position.z = -center.z * smallScale;
                     
                     if (gltf.animations && gltf.animations.length > 0) {
                         console.log('アニメーション発見:', gltf.animations.length + '個');
@@ -359,11 +356,11 @@
                         console.log('アニメーションが見つかりません');
                     }
 
-                    // スケール調整
-                    character.scale.setScalar(1);
-                    character.position.y = 0;
-                    
                     console.log('GLBモデルの設定完了');
+                    
+                    // 初期スケールを強制適用
+                    character.scale.setScalar(0.01); // 非常に小さく設定
+                    console.log('初期スケール0.01を適用');
                     
                     // 強制的にモデル解析を実行
                     setTimeout(() => {
@@ -455,10 +452,10 @@
 
         // コントロール設定
         function setupControls() {
-            // カメラの初期設定（もっと高い位置、小さいサイズ）
+            // カメラの初期設定（かなり高い位置）
             camera.userData = {
                 baseX: -2,
-                baseY: 10,
+                baseY: 15,
                 baseZ: 8
             };
             
@@ -558,19 +555,19 @@
             document.getElementById('rotYSlider').value = 180;
             document.getElementById('cameraXSlider').value = -2;
             document.getElementById('cameraDistSlider').value = 8;
-            document.getElementById('cameraHeightSlider').value = 10;
+            document.getElementById('cameraHeightSlider').value = 15;
 
             if (character) {
-                character.scale.setScalar(0.01);
+                character.scale.setScalar(0.01); // 極小サイズを強制適用
                 character.position.set(originalCharacterPosition.x, originalCharacterPosition.y, originalCharacterPosition.z);
                 character.rotation.y = Math.PI; // 180度回転（後ろ向き）
-                console.log('キャラクター位置リセット完了');
+                console.log('キャラクター位置リセット完了 - スケール0.01適用');
             }
 
-            camera.position.set(-2, 10, 8);
-            camera.lookAt(0, 0, 0);
+            camera.position.set(-2, 15, 8);
+            camera.lookAt(0, -2, 0);
             camera.userData.baseX = -2;
-            camera.userData.baseY = 10;
+            camera.userData.baseY = 15;
             camera.userData.baseZ = 8;
 
             // 値の表示も更新
@@ -581,7 +578,7 @@
             document.getElementById('rotYValue').textContent = '180°';
             document.getElementById('cameraXValue').textContent = '-2.0';
             document.getElementById('cameraDistValue').textContent = '8.0';
-            document.getElementById('cameraHeightValue').textContent = '10.0';
+            document.getElementById('cameraHeightValue').textContent = '15.0';
             
             console.log('リセット完了');
         }
