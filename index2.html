@@ -575,65 +575,19 @@
                 if (child.isMesh) {
                     meshCount++;
                     
-                    console.log(`メッシュ ${meshCount}:`, {
-                        name: child.name || 'Unnamed',
-                        visible: child.visible,
-                        vertices: child.geometry ? child.geometry.attributes.position?.count : 0,
-                        hasUV: child.geometry ? !!child.geometry.attributes.uv : false,
-                        scale: `${child.scale.x.toFixed(3)}, ${child.scale.y.toFixed(3)}, ${child.scale.z.toFixed(3)}`,
-                        position: `${child.position.x.toFixed(3)}, ${child.position.y.toFixed(3)}, ${child.position.z.toFixed(3)}`
-                    });
+                    console.log(`メッシュ ${meshCount}: ${child.name || 'Unnamed'}`);
+                    console.log(`  visible: ${child.visible}, vertices: ${child.geometry ? child.geometry.attributes.position?.count : 0}`);
                     
                     // マテリアル情報
                     if (child.material) {
                         if (Array.isArray(child.material)) {
                             child.material.forEach((material, index) => {
                                 materialCount++;
-                                console.log(`  マテリアル ${materialCount}:`, {
-                                    name: material.name || 'Unnamed',
-                                    opacity: material.opacity,
-                                    transparent: material.transparent,
-                                    side: material.side === THREE.DoubleSide ? 'DoubleSide' : 
-                                          material.side === THREE.FrontSide ? 'FrontSide' : 'BackSide',
-                                    depthWrite: material.depthWrite,
-                                    depthTest: material.depthTest
-                                });
-                                
-                                // 強制的に全面表示設定
-                                material.side = THREE.DoubleSide;
-                                material.depthTest = true;
-                                material.alphaTest = 0.001;
-                                if (material.opacity < 0.99) {
-                                    material.transparent = true;
-                                    material.depthWrite = false;
-                                } else {
-                                    material.depthWrite = true;
-                                }
-                                material.needsUpdate = true;
+                                analyzeMaterial(material, materialCount, child.name);
                             });
                         } else {
                             materialCount++;
-                            console.log(`  マテリアル ${materialCount}:`, {
-                                name: child.material.name || 'Unnamed',
-                                opacity: child.material.opacity,
-                                transparent: child.material.transparent,
-                                side: child.material.side === THREE.DoubleSide ? 'DoubleSide' : 
-                                      child.material.side === THREE.FrontSide ? 'FrontSide' : 'BackSide',
-                                depthWrite: child.material.depthWrite,
-                                depthTest: child.material.depthTest
-                            });
-                            
-                            // 強制的に全面表示設定
-                            child.material.side = THREE.DoubleSide;
-                            child.material.depthTest = true;
-                            child.material.alphaTest = 0.001;
-                            if (child.material.opacity < 0.99) {
-                                child.material.transparent = true;
-                                child.material.depthWrite = false;
-                            } else {
-                                child.material.depthWrite = true;
-                            }
-                            child.material.needsUpdate = true;
+                            analyzeMaterial(child.material, materialCount, child.name);
                         }
                     } else {
                         console.log('  マテリアルなし');
@@ -646,7 +600,42 @@
             });
             
             console.log(`=== 解析完了: メッシュ${meshCount}個, マテリアル${materialCount}個 ===`);
-            console.log('全マテリアルを両面描画に強制設定しました');
+        }
+        
+        function analyzeMaterial(material, index, meshName) {
+            console.log(`  マテリアル ${index} (${material.name || 'Unnamed'})`);
+            console.log(`    opacity: ${material.opacity}, transparent: ${material.transparent}`);
+            console.log(`    color: ${material.color ? `rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})` : 'なし'}`);
+            
+            // テクスチャの確認
+            const textures = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap', 'aoMap'];
+            textures.forEach(texType => {
+                if (material[texType]) {
+                    console.log(`    ${texType}: ${material[texType].image ? '読み込み済み' : '未読み込み'} (${material[texType].image ? `${material[texType].image.width}x${material[texType].image.height}` : 'サイズ不明'})`);
+                    
+                    // テクスチャが読み込まれていない場合の対処
+                    if (!material[texType].image) {
+                        console.log(`      ${texType} の読み込みに問題があります`);
+                        // 基本的な色を設定
+                        if (texType === 'map' && !material.color) {
+                            material.color = new THREE.Color(0xffffff); // 白色をデフォルト
+                            console.log(`      デフォルト色を設定: 白`);
+                        }
+                    }
+                }
+            });
+            
+            // 強制的に全面表示設定（前と同じ）
+            material.side = THREE.DoubleSide;
+            material.depthTest = true;
+            material.alphaTest = 0.001;
+            if (material.opacity < 0.99) {
+                material.transparent = true;
+                material.depthWrite = false;
+            } else {
+                material.depthWrite = true;
+            }
+            material.needsUpdate = true;
         }
 
         // 初期化
