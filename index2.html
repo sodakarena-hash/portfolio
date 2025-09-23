@@ -626,56 +626,60 @@
             const meshNameLower = meshName?.toLowerCase() || '';
             const originalColor = material.color ? material.color.clone() : null;
             
-            // 輪郭線判定を強化（より厳密に）
-            const isOutline = materialName.includes('輪郭') || 
-                            materialName.includes('outline') || 
-                            materialName.includes('rim') ||
-                            materialName.includes('line') ||
-                            materialName.includes('edge') ||
-                            meshNameLower.includes('輪郭') ||
-                            meshNameLower.includes('outline') ||
-                            meshNameLower.includes('rim') ||
-                            meshNameLower.includes('line') ||
-                            meshNameLower.includes('edge');
+            // Solidifyで作られた輪郭線メッシュの判定
+            const isSolidifyOutline = meshNameLower.includes('.001') || 
+                                    meshNameLower.includes('.002') || 
+                                    meshNameLower.includes('.003') ||
+                                    meshNameLower.includes('_outline') ||
+                                    meshNameLower.includes('_rim') ||
+                                    meshNameLower.includes('_edge') ||
+                                    meshNameLower.includes('outline') ||
+                                    meshNameLower.includes('rim') ||
+                                    meshNameLower.includes('edge') ||
+                                    // 明示的な輪郭線マテリアル名
+                                    materialName.includes('輪郭') || 
+                                    materialName.includes('outline') ||
+                                    materialName.includes('rim') ||
+                                    materialName.includes('line');
             
-            console.log(`    輪郭線判定: ${isOutline}`);
+            console.log(`    Solidify輪郭線判定: ${isSolidifyOutline}`);
             
-            // 輪郭線マテリアルの処理
-            if (isOutline) {
-                console.log(`    🔥 輪郭線マテリアル処理開始`);
+            // Solidify輪郭線メッシュの処理
+            if (isSolidifyOutline) {
+                console.log(`    🔥 Solidify輪郭線メッシュ処理開始`);
                 
-                // 輪郭線の色設定（赤系の輪郭線）
+                // 輪郭線の色設定
                 if (originalColor && (originalColor.r > 0.3 && originalColor.g < 0.3 && originalColor.b < 0.3)) {
                     // 元の色が赤系の場合はそれを維持
                     material.color = originalColor.clone();
-                    console.log(`    輪郭線: 元の赤色を維持 rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
+                    console.log(`    Solidify輪郭線: 元の赤色を維持`);
                 } else if (originalColor && (originalColor.r < 0.5 || originalColor.g < 0.5 || originalColor.b < 0.5)) {
                     // 元の色が暗い場合はそれを維持
                     material.color = originalColor.clone();
-                    console.log(`    輪郭線: 元の暗い色を維持 rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
+                    console.log(`    Solidify輪郭線: 元の暗い色を維持`);
                 } else {
                     // その他の場合は黒い輪郭線に設定
-                    material.color = new THREE.Color(0.0, 0.0, 0.0); // 完全な黒
-                    console.log(`    輪郭線: 黒色を設定`);
+                    material.color = new THREE.Color(0.0, 0.0, 0.0);
+                    console.log(`    Solidify輪郭線: 黒色を設定`);
                 }
                 
-                // 【重要】背面法のための設定
-                material.side = THREE.BackSide; // 背面のみ描画
-                material.depthWrite = true; // 深度書き込みを有効にしてZ-fighting防止
-                material.depthTest = true; // 深度テストも有効
-                material.transparent = false; // 輪郭線は不透明
-                material.alphaTest = 0; // アルファテスト無効
+                // Solidify用の設定（法線が既に反転されているので正面描画）
+                material.side = THREE.FrontSide; // Solidifyで法線反転済みなので正面描画
+                material.depthWrite = true;
+                material.depthTest = true;
+                material.transparent = false;
+                material.alphaTest = 0;
                 
                 // テクスチャを無効化（輪郭線には不要）
                 if (material.map) {
                     material.map = null;
-                    console.log(`    輪郭線: テクスチャを無効化`);
+                    console.log(`    Solidify輪郭線: テクスチャを無効化`);
                 }
                 
-                console.log(`    ✅ 輪郭線設定完了: BackSide, 黒色, 深度有効`);
+                console.log(`    ✅ Solidify輪郭線設定完了: FrontSide（法線反転済み）, 輪郭線色, テクスチャなし`);
                 
             } else if (material.map && material.map.image) {
-                // テクスチャがあり、輪郭線でない場合（元のコードを維持）
+                // 通常のテクスチャありメッシュ（元のメッシュ）
                 const texture = material.map;
                 const textureId = texture.uuid || texture.image.src || 'unknown';
                 const matName = material.name || 'Unnamed';
@@ -686,8 +690,7 @@
                 }
                 textureMap.get(textureId).push(matName);
                 
-                console.log(`    map: 存在 (${texture.image.width}x${texture.image.height})`);
-                console.log(`    テクスチャID: ${textureId.substring(0, 20)}...`);
+                console.log(`    通常メッシュ: テクスチャあり (${texture.image.width}x${texture.image.height})`);
                 
                 // UV座標の確認
                 if (texture.repeat) {
@@ -697,9 +700,9 @@
                     console.log(`    UV offset: ${texture.offset.x}, ${texture.offset.y}`);
                 }
                 
-                // 【重要】テクスチャがあるマテリアルは必ず白色に設定
-                material.color = new THREE.Color(1, 1, 1); // 白色でテクスチャをそのまま表示
-                console.log(`    テクスチャマテリアル: 色を白に設定してテクスチャを正常表示`);
+                // 通常メッシュは白色でテクスチャを表示
+                material.color = new THREE.Color(1, 1, 1);
+                console.log(`    通常メッシュ: 白色設定でテクスチャ表示`);
                 
                 // テクスチャ設定の最適化
                 texture.encoding = THREE.sRGBEncoding;
@@ -708,22 +711,22 @@
                 texture.wrapT = THREE.RepeatWrapping;
                 texture.needsUpdate = true;
                 
-                // 通常マテリアル設定
-                material.side = THREE.FrontSide; // 正面描画
+                // 通常メッシュ設定
+                material.side = THREE.FrontSide;
                 material.depthWrite = true;
                 material.depthTest = true;
                 
             } else {
-                // テクスチャなしの通常マテリアル（元のコードを維持）
-                console.log(`    テクスチャなしマテリアル`);
+                // テクスチャなしの通常メッシュ
+                console.log(`    通常メッシュ: テクスチャなし`);
                 
                 if (materialName.includes('髪') || materialName.includes('hair')) {
                     material.color = new THREE.Color(0x8B4513); // 茶色
-                    console.log(`    髪（テクスチャなし）: 茶色を設定`);
+                    console.log(`    髪: 茶色を設定`);
                 } else if (materialName.includes('肌') || materialName.includes('skin') || 
                           meshNameLower.includes('face') || meshNameLower.includes('body')) {
                     material.color = new THREE.Color(0xFFDDBB); // 肌色
-                    console.log(`    肌（テクスチャなし）: 肌色を設定`);
+                    console.log(`    肌: 肌色を設定`);
                 } else if (originalColor && (originalColor.r !== 1 || originalColor.g !== 1 || originalColor.b !== 1)) {
                     // 元の色が白でない場合は、元の色を維持
                     material.color = originalColor;
@@ -733,14 +736,14 @@
                     console.log(`    その他: グレーを設定`);
                 }
                 
-                // 通常マテリアル設定
+                // 通常メッシュ設定
                 material.side = THREE.FrontSide;
                 material.depthWrite = true;
                 material.depthTest = true;
             }
             
-            // 共通設定（輪郭線以外）
-            if (!isOutline) {
+            // 共通設定（Solidify輪郭線以外）
+            if (!isSolidifyOutline) {
                 material.alphaTest = 0.001;
                 if (material.opacity < 0.99) {
                     material.transparent = true;
@@ -749,7 +752,7 @@
             
             material.needsUpdate = true;
             
-            console.log(`    最終設定: side=${material.side === THREE.FrontSide ? 'Front' : material.side === THREE.BackSide ? 'Back' : 'Double'}, depthWrite=${material.depthWrite}, color=rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
+            console.log(`    最終設定: side=${material.side === THREE.FrontSide ? 'Front' : material.side === THREE.BackSide ? 'Back' : 'Double'}, color=rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
         }
 
         // 初期化
