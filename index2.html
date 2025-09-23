@@ -116,6 +116,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
     <script>
         // Three.js セットアップ
         let scene, camera, renderer, mixer, clock;
@@ -198,9 +199,27 @@
             if (typeof THREE.GLTFLoader !== 'undefined') {
                 loader = new THREE.GLTFLoader();
                 console.log('THREE.GLTFLoaderを使用');
+                
+                // DRACOLoaderの設定
+                if (typeof THREE.DRACOLoader !== 'undefined' || typeof DRACOLoader !== 'undefined') {
+                    const dracoLoader = typeof THREE.DRACOLoader !== 'undefined' 
+                        ? new THREE.DRACOLoader() 
+                        : new DRACOLoader();
+                    dracoLoader.setDecoderPath('https://unpkg.com/three@0.128.0/examples/js/libs/draco/');
+                    loader.setDRACOLoader(dracoLoader);
+                    console.log('DRACOLoaderを設定しました');
+                }
             } else if (typeof GLTFLoader !== 'undefined') {
                 loader = new GLTFLoader();
                 console.log('GLTFLoaderを使用');
+                
+                // DRACOLoaderの設定
+                if (typeof DRACOLoader !== 'undefined') {
+                    const dracoLoader = new DRACOLoader();
+                    dracoLoader.setDecoderPath('https://unpkg.com/three@0.128.0/examples/js/libs/draco/');
+                    loader.setDRACOLoader(dracoLoader);
+                    console.log('DRACOLoaderを設定しました');
+                }
             }
             
             loader.load(
