@@ -112,8 +112,8 @@
         
         <div class="control-group">
             <label>スケール（サイズ）</label>
-            <input type="range" id="scaleSlider" min="0.01" max="2" step="0.01" value="0.1">
-            <div class="value">値: <span id="scaleValue">0.1</span></div>
+            <input type="range" id="scaleSlider" min="0.01" max="2" step="0.01" value="0.05">
+            <div class="value">値: <span id="scaleValue">0.05</span></div>
         </div>
 
         <div class="control-group">
@@ -154,8 +154,8 @@
 
         <div class="control-group">
             <label>カメラ高さ</label>
-            <input type="range" id="cameraHeightSlider" min="-5" max="10" step="0.1" value="3">
-            <div class="value">値: <span id="cameraHeightValue">3.0</span></div>
+            <input type="range" id="cameraHeightSlider" min="-5" max="15" step="0.1" value="6">
+            <div class="value">値: <span id="cameraHeightValue">6.0</span></div>
         </div><label>カメラ高さ</label>
             <input type="range" id="cameraHeightSlider" min="-15" max="5" step="0.1" value="1">
             <div class="value">値: <span id="cameraHeightValue">1.0</span></div>
@@ -183,31 +183,19 @@
 
     <div class="content">
         <div class="section">
-            <div>
-                <h1>3Dキャラクター</h1>
-                <p style="font-size: 1.5rem; margin-top: 20px;">スクロールでアニメーションが開始されます</p>
-            </div>
+            <!-- スクロール用のスペース -->
         </div>
         
         <div class="section">
-            <div>
-                <h2>アニメーション進行中</h2>
-                <p style="font-size: 1.5rem; margin-top: 20px;">後ろ向きから前向きへ</p>
-            </div>
+            <!-- スクロール用のスペース -->
         </div>
         
         <div class="section">
-            <div>
-                <h2>アニメーション完了</h2>
-                <p style="font-size: 1.5rem; margin-top: 20px;">前向きポーズ</p>
-            </div>
+            <!-- スクロール用のスペース -->
         </div>
         
         <div class="section">
-            <div>
-                <h2>最終セクション</h2>
-                <p style="font-size: 1.5rem; margin-top: 20px;">実装完了！</p>
-            </div>
+            <!-- スクロール用のスペース -->
         </div>
     </div>
 
@@ -227,9 +215,9 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x000000, 0); // 透明背景
 
-            // カメラ設定 - 左寄り・高い位置に調整
+            // カメラ設定 - さらに高い位置に調整
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.001, 10000);
-            camera.position.set(-2, 3, 8); // X=-2で左寄り、Y=3で高く
+            camera.position.set(-2, 6, 8); // Y=6でより高く
             camera.lookAt(0, 1, 0); // キャラクターの中央付近を見る
 
             // レンダラー設定
@@ -467,10 +455,10 @@
 
         // コントロール設定
         function setupControls() {
-            // カメラの初期設定（左寄り・高い位置）
+            // カメラの初期設定（より高い位置）
             camera.userData = {
                 baseX: -2,
-                baseY: 3,
+                baseY: 6,
                 baseZ: 8
             };
             
@@ -563,37 +551,37 @@
         function resetSettings() {
             console.log('設定をリセット中...');
             
-            document.getElementById('scaleSlider').value = 0.1;
+            document.getElementById('scaleSlider').value = 0.05;
             document.getElementById('posXSlider').value = 0;
             document.getElementById('posYSlider').value = 0;
             document.getElementById('posZSlider').value = 0;
             document.getElementById('rotYSlider').value = 180;
             document.getElementById('cameraXSlider').value = -2;
             document.getElementById('cameraDistSlider').value = 8;
-            document.getElementById('cameraHeightSlider').value = 3;
+            document.getElementById('cameraHeightSlider').value = 6;
 
             if (character) {
-                character.scale.setScalar(0.1);
+                character.scale.setScalar(0.05);
                 character.position.set(originalCharacterPosition.x, originalCharacterPosition.y, originalCharacterPosition.z);
                 character.rotation.y = Math.PI; // 180度回転（後ろ向き）
                 console.log('キャラクター位置リセット完了');
             }
 
-            camera.position.set(-2, 3, 8);
+            camera.position.set(-2, 6, 8);
             camera.lookAt(0, 1, 0);
             camera.userData.baseX = -2;
-            camera.userData.baseY = 3;
+            camera.userData.baseY = 6;
             camera.userData.baseZ = 8;
 
             // 値の表示も更新
-            document.getElementById('scaleValue').textContent = '0.1';
+            document.getElementById('scaleValue').textContent = '0.05';
             document.getElementById('posXValue').textContent = '0.0';
             document.getElementById('posYValue').textContent = '0.0';
             document.getElementById('posZValue').textContent = '0.0';
             document.getElementById('rotYValue').textContent = '180°';
             document.getElementById('cameraXValue').textContent = '-2.0';
             document.getElementById('cameraDistValue').textContent = '8.0';
-            document.getElementById('cameraHeightValue').textContent = '3.0';
+            document.getElementById('cameraHeightValue').textContent = '6.0';
             
             console.log('リセット完了');
         }
