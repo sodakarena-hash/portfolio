@@ -344,6 +344,7 @@
                     character.position.x = -center.x * scale;
                     character.position.y = -box.min.y * scale;
                     character.position.z = -center.z * scale;
+                    
                     if (gltf.animations && gltf.animations.length > 0) {
                         console.log('アニメーション発見:', gltf.animations.length + '個');
                         mixer = new THREE.AnimationMixer(character);
@@ -617,12 +618,59 @@
         function analyzeMaterial(material, index, meshName, textureMap) {
             console.log(`  マテリアル ${index} (${material.name || 'Unnamed'})`);
             console.log(`    color: ${material.color ? `rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})` : 'なし'}`);
+            console.log(`    meshName: ${meshName}`);
             
             const materialName = material.name?.toLowerCase() || '';
+            const meshNameLower = meshName?.toLowerCase() || '';
             const originalColor = material.color ? material.color.clone() : null;
             
-            // テクスチャの詳細確認とID記録
-            if (material.map && material.map.image) {
+            // 輪郭線判定を強化（マテリアル名とメッシュ名の両方を確認）
+            const isOutline = materialName.includes('輪郭') || 
+                            materialName.includes('outline') || 
+                            materialName.includes('rim') ||
+                            materialName.includes('line') ||
+                            materialName.includes('edge') ||
+                            meshNameLower.includes('輪郭') ||
+                            meshNameLower.includes('outline') ||
+                            meshNameLower.includes('rim') ||
+                            meshNameLower.includes('line') ||
+                            meshNameLower.includes('edge') ||
+                            // 背面描画の判定も追加
+                            (material.side === THREE.BackSide) ||
+                            // 色が暗い場合も輪郭線の可能性
+                            (originalColor && originalColor.r < 0.3 && originalColor.g < 0.3 && originalColor.b < 0.3);
+            
+            console.log(`    輪郭線判定: ${isOutline} (side: ${material.side}, color: ${originalColor ? `rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})` : 'なし'})`);
+            
+            // 輪郭線マテリアルを優先的に処理
+            if (isOutline) {
+                // 輪郭線マテリアル処理
+                console.log(`    輪郭線マテリアル処理開始`);
+                
+                // 輪郭線の色設定（元の暗い色を維持または新たに設定）
+                if (originalColor && (originalColor.r < 0.5 || originalColor.g < 0.5 || originalColor.b < 0.5)) {
+                    // 元の色が暗い場合はそれを維持
+                    material.color = originalColor.clone();
+                    console.log(`    輪郭線: 元の暗い色を維持 rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
+                } else {
+                    // 明るい色の場合は暗い色を設定
+                    material.color = new THREE.Color(0.1, 0.1, 0.1); // 濃いグレー
+                    console.log(`    輪郭線: 濃いグレーを設定`);
+                }
+                
+                // 輪郭線用の特別設定
+                material.side = THREE.BackSide; // 背面のみ描画
+                material.depthWrite = false; // 深度書き込みを無効
+                material.depthTest = true; // 深度テストは有効
+                
+                // テクスチャを無効化（輪郭線には不要）
+                if (material.map) {
+                    material.map = null;
+                    console.log(`    輪郭線: テクスチャを無効化`);
+                }
+                
+            } else if (material.map && material.map.image) {
+                // テクスチャがあり、輪郭線でない場合
                 const texture = material.map;
                 const textureId = texture.uuid || texture.image.src || 'unknown';
                 const matName = material.name || 'Unnamed';
@@ -646,7 +694,7 @@
                 
                 // 【重要】テクスチャがあるマテリアルは必ず白色に設定
                 material.color = new THREE.Color(1, 1, 1); // 白色でテクスチャをそのまま表示
-                console.log(`    テクスチャあり: 色を白に設定してテクスチャを正常表示`);
+                console.log(`    テクスチャマテリアル: 色を白に設定してテクスチャを正常表示`);
                 
                 // テクスチャ設定の最適化
                 texture.encoding = THREE.sRGBEncoding;
@@ -655,66 +703,53 @@
                 texture.wrapT = THREE.RepeatWrapping;
                 texture.needsUpdate = true;
                 
-            } else {
-                console.log(`    map: なし`);
+                // 通常マテリアル設定
+                material.side = THREE.FrontSide; // 正面描画
+                material.depthWrite = true;
+                material.depthTest = true;
                 
-                // テクスチャがない場合のみ色設定を行う
-                if (materialName.includes('輪郭') || materialName.includes('outline')) {
-                    // 輪郭線の場合、元の色を維持（背面法用）
-                    if (originalColor && originalColor.r < 0.9) { // 元の色が白でない場合
-                        material.color = originalColor; // 元の色を維持
-                        console.log(`    輪郭線: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
-                    } else {
-                        // 元の色がない、または白い場合は赤い輪郭線に設定
-                        material.color = new THREE.Color(0.7, 0.05, 0.05); // 赤い輪郭線
-                        console.log(`    輪郭線: 赤色を設定`);
-                    }
-                    
-                    // 輪郭線用の特別設定
-                    material.side = THREE.BackSide; // 背面のみ描画
-                    material.depthWrite = false; // 深度書き込みを無効にして輪郭線を背後に
-                    
+            } else {
+                // テクスチャなしの通常マテリアル
+                console.log(`    テクスチャなしマテリアル`);
+                
+                if (materialName.includes('髪') || materialName.includes('hair')) {
+                    material.color = new THREE.Color(0x8B4513); // 茶色
+                    console.log(`    髪（テクスチャなし）: 茶色を設定`);
+                } else if (materialName.includes('肌') || materialName.includes('skin') || 
+                          meshNameLower.includes('face') || meshNameLower.includes('body')) {
+                    material.color = new THREE.Color(0xFFDDBB); // 肌色
+                    console.log(`    肌（テクスチャなし）: 肌色を設定`);
+                } else if (originalColor && (originalColor.r !== 1 || originalColor.g !== 1 || originalColor.b !== 1)) {
+                    // 元の色が白でない場合は、元の色を維持
+                    material.color = originalColor;
+                    console.log(`    その他: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
                 } else {
-                    // その他のテクスチャなしマテリアル
-                    if (materialName.includes('髪') || materialName.includes('hair')) {
-                        material.color = new THREE.Color(0x8B4513); // 茶色
-                        console.log(`    髪（テクスチャなし）: 茶色を設定`);
-                    } else if (materialName.includes('肌') || materialName.includes('skin')) {
-                        material.color = new THREE.Color(0xFFDDBB); // 肌色
-                        console.log(`    肌（テクスチャなし）: 肌色を設定`);
-                    } else if (originalColor && (originalColor.r !== 1 || originalColor.g !== 1 || originalColor.b !== 1)) {
-                        // 元の色が白でない場合は、元の色を維持
-                        material.color = originalColor;
-                        console.log(`    その他: 元の色を維持 rgb(${Math.round(originalColor.r*255)},${Math.round(originalColor.g*255)},${Math.round(originalColor.b*255)})`);
-                    } else {
-                        material.color = new THREE.Color(0xCCCCCC); // グレー
-                        console.log(`    その他: グレーを設定`);
-                    }
-                    
-                    // 通常マテリアル設定
-                    material.side = THREE.DoubleSide;
-                    material.depthWrite = true;
+                    material.color = new THREE.Color(0xCCCCCC); // グレー
+                    console.log(`    その他: グレーを設定`);
                 }
+                
+                // 通常マテリアル設定
+                material.side = THREE.FrontSide;
+                material.depthWrite = true;
+                material.depthTest = true;
             }
             
             // 共通設定
-            material.depthTest = true;
             material.alphaTest = 0.001;
             if (material.opacity < 0.99) {
                 material.transparent = true;
-                if (material.side !== THREE.BackSide) { // 輪郭線以外
-                    material.depthWrite = false;
-                }
             }
             
             material.needsUpdate = true;
+            
+            console.log(`    最終設定: side=${material.side === THREE.FrontSide ? 'Front' : material.side === THREE.BackSide ? 'Back' : 'Double'}, depthWrite=${material.depthWrite}, color=rgb(${Math.round(material.color.r*255)},${Math.round(material.color.g*255)},${Math.round(material.color.b*255)})`);
         }
 
         // 初期化
         init();
 
         // GLBファイルを読み込む場合は以下のコメントアウトを解除
-        loadGLBModel('models/iori.glb');
+         loadGLBModel('models/iori.glb');
     </script>
 </body>
 </html>
