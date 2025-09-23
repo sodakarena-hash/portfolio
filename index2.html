@@ -115,7 +115,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
     <script>
         // Three.js セットアップ
         let scene, camera, renderer, mixer, clock;
@@ -186,8 +186,8 @@
             // 実際のGLBファイルの代わりにプレースホルダーを作成
             const group = new THREE.Group();
             
-            // 体
-            const bodyGeometry = new THREE.CapsuleGeometry(0.3, 1.2, 4, 8);
+            // 体 - CylinderGeometryを使用
+            const bodyGeometry = new THREE.CylinderGeometry(0.3, 0.3, 1.2, 8);
             const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x4a90e2 });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
             body.position.y = 1;
@@ -202,8 +202,8 @@
             head.castShadow = true;
             group.add(head);
 
-            // 腕
-            const armGeometry = new THREE.CapsuleGeometry(0.08, 0.8, 4, 8);
+            // 腕 - CylinderGeometryを使用
+            const armGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.8, 6);
             const armMaterial = new THREE.MeshPhongMaterial({ color: 0xfdbcb4 });
             
             const leftArm = new THREE.Mesh(armGeometry, armMaterial);
@@ -218,8 +218,8 @@
             rightArm.castShadow = true;
             group.add(rightArm);
 
-            // 脚
-            const legGeometry = new THREE.CapsuleGeometry(0.12, 0.9, 4, 8);
+            // 脚 - CylinderGeometryを使用
+            const legGeometry = new THREE.CylinderGeometry(0.12, 0.12, 0.9, 8);
             const legMaterial = new THREE.MeshPhongMaterial({ color: 0x2c3e50 });
             
             const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
@@ -257,25 +257,58 @@
 
         // 実際のGLBファイルを読み込む場合の関数
         function loadGLBModel(url) {
+            console.log('GLBファイルの読み込み開始:', url);
+            
+            // GLTFLoaderが存在するかチェック
+            if (typeof THREE.GLTFLoader === 'undefined') {
+                console.error('GLTFLoaderが読み込まれていません');
+                return;
+            }
+            
             const loader = new THREE.GLTFLoader();
-            loader.load(url, (gltf) => {
-                character = gltf.scene;
-                scene.add(character);
+            loader.load(
+                url,
+                // 成功時
+                (gltf) => {
+                    console.log('GLBファイルの読み込み成功:', gltf);
+                    
+                    // プレースホルダーを削除
+                    if (character) {
+                        scene.remove(character);
+                    }
+                    
+                    character = gltf.scene;
+                    scene.add(character);
 
-                // アニメーションミキサーの設定
-                if (gltf.animations && gltf.animations.length > 0) {
-                    mixer = new THREE.AnimationMixer(character);
-                    animationAction = mixer.clipAction(gltf.animations[0]);
-                    animationAction.setLoop(THREE.LoopOnce);
-                    animationAction.clampWhenFinished = true;
-                    animationAction.play();
-                    animationAction.paused = true;
+                    // アニメーションミキサーの設定
+                    if (gltf.animations && gltf.animations.length > 0) {
+                        console.log('アニメーション発見:', gltf.animations.length + '個');
+                        mixer = new THREE.AnimationMixer(character);
+                        animationAction = mixer.clipAction(gltf.animations[0]);
+                        animationAction.setLoop(THREE.LoopOnce);
+                        animationAction.clampWhenFinished = true;
+                        animationAction.play();
+                        animationAction.paused = true;
+                    } else {
+                        console.log('アニメーションが見つかりません');
+                    }
+
+                    // スケール調整
+                    character.scale.setScalar(1);
+                    character.position.y = 0;
+                    
+                    console.log('GLBモデルの設定完了');
+                },
+                // 進行状況
+                (progress) => {
+                    console.log('読み込み進行状況:', (progress.loaded / progress.total * 100) + '%');
+                },
+                // エラー時
+                (error) => {
+                    console.error('GLBファイルの読み込みエラー:', error);
+                    console.log('プレースホルダーを使用します');
                 }
-
-                // スケール調整
-                character.scale.setScalar(1);
-                character.position.y = 0;
-            });
+            );
         }
 
         function onScroll() {
