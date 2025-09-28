@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Horizontal Card Carousel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 550px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* PC版：右半分に配置 */
+        @media (min-width: 768px) {
+            body {
+                justify-content: flex-end;
+                padding-right: 50px;
+            }
+            
+            .carousel-container {
+                width: 50%;
+                margin-left: auto;
+            }
+        }
+
+        /* SP版：中央に配置 */
+        @media (max-width: 767px) {
+            .carousel-container {
+                width: 100%;
+                height: 450px;
+                padding: 0 20px;
+            }
+        }
+
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            perspective: 1500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .carousel-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0.02, 0.1, 1);
+        }
+
+        .card {
+            position: absolute;
+            width: 280px;
+            height: 380px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.4, 0.02, 0.1, 1);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            left: 50%;
+            top: 50%;
+            margin-left: -140px;
+            margin-top: -190px;
+        }
+
+        .card img {
+            width: 100%;
+            height: 60%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .card-content {
+            padding: 20px;
+            height: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 5;
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: left;
+            line-height: 1.3;
+            min-height: 1.8em;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .card-description {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+            width: 100%;
+            text-align: left;
+            min-height: 4em;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        /* 中央のカード（アクティブ） */
+        .card.active {
+            z-index: 10;
+            transform: translateZ(100px) scale(1.15);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+        }
+
+        .card.active img {
+            transform: scale(1.05);
+        }
+
+        .card.active .card-title {
+            font-size: 1.4em;
+        }
+
+        .card.active .card-description {
+            font-size: 0.9em;
+        }
+
+        /* 非アクティブカード */
+        .card:not(.active) {
+            opacity: 0.7;
+        }
+
+        /* ナビゲーションボタン */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            color: #333;
+            z-index: 20;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .nav-btn.prev {
+            left: 20px;
+        }
+
+        .nav-btn.next {
+            right: 20px;
+        }
+
+        /* インジケーター */
+        .indicators {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 25;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+        }
+
+        .indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .indicator:hover {
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(1.2);
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.4);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+
+        /* スマートフォン用調整 */
+        @media (max-width: 767px) {
+            .card {
+                width: 240px;
+                height: 320px;
+                margin-left: -120px;
+                margin-top: -160px;
+            }
+
+            .card-title {
+                font-size: 1.2em;
+                min-height: 1.6em;
+            }
+
+            .card-description {
+                font-size: 0.8em;
+                min-height: 3.5em;
+            }
+
+            .card.active .card-title {
+                font-size: 1.2em;
+            }
+
+            .card.active .card-description {
+                font-size: 0.8em;
+            }
+
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .nav-btn.prev {
+                left: 10px;
+            }
+
+            .nav-btn.next {
+                right: 10px;
+            }
+            
+            .indicators {
+                bottom: -15px;
+                padding: 8px 16px;
+            }
+        }
+
+        /* 回転エフェクト用のグロー */
+        .carousel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+
+        .carousel.rotating::before {
+            opacity: 1;
+        }
+
+        /* ホバーエフェクト */
+        .card:hover:not(.active) {
+            opacity: 0.9;
+            transform: translateZ(50px) scale(1.05);
+        }
+
+        .card.active:hover {
+            transform: translateZ(120px) scale(1.2);
+        }
+
+        /* ロード時アニメーション */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(100px) rotateX(-90deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg);
+            }
+        }
+
+        .carousel-container {
+            animation: fadeIn 1.2s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel" id="carousel">
+            <div class="carousel-stage" id="carouselStage">
+                <div class="card">
+                    <img src="https://picsum.photos/280/228?random=1" alt="Card 1">
+                    <div class="card-content">
+                        <h3 class="card-title">美しい風景</h3>
+                        <p class="card-description">自然の美しさを表現した素晴らしい写真です。四季の移ろいを感じることができます。</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://picsum.photos/280/228?random=2" alt="Card 2">
+                    <div class="card-content">
+                        <h3 class="card-title">都市の夜景</h3>
+                        <p class="card-description">きらめく都市のライトが織りなす幻想的な夜の風景をお楽しみください。</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://picsum.photos/280/228?random=3" alt="Card 3">
+                    <div class="card-content">
+                        <h3 class="card-title">海辺の風景</h3>
+                        <p class="card-description">波打ち際に佇む美しい海岸線。心を癒やしてくれる穏やかな海の風景です。</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://picsum.photos/280/228?random=4" alt="Card 4">
+                    <div class="card-content">
+                        <h3 class="card-title">森の小径</h3>
+                        <p class="card-description">緑豊かな森の中を通る小径。自然の静寂と美しさに包まれた空間です。</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <img src="https://picsum.photos/280/228?random=5" alt="Card 5">
+                    <div class="card-content">
+                        <h3 class="card-title">山々の景色</h3>
+                        <p class="card-description">雄大な山々が連なる壮大な風景。大自然の力強さを感じられます。</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <img src="https://picsum.photos/280/228?random=6" alt="Card 6">
+                    <div class="card-content">
+                        <h3 class="card-title">桜並木</h3>
+                        <p class="card-description">春の訪れを告げる美しい桜並木。淡いピンクの花びらが風に舞います。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="nav-btn prev" onclick="rotateCarousel(-1)">‹</button>
+            <button class="nav-btn next" onclick="rotateCarousel(1)">›</button>
+            
+            <div class="indicators" id="indicators"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentRotation = 0;
+        let currentIndex = 0;
+        const cards = document.querySelectorAll('.card');
+        const totalCards = cards.length;
+        const carousel = document.getElementById('carousel');
+        const carouselStage = document.getElementById('carouselStage');
+        const indicatorsContainer = document.getElementById('indicators');
+        
+        // 角度と半径の設定
+        const angleStep = 360 / totalCards;
+        let radius = window.innerWidth <= 767 ? 300 : 400; // レスポンシブ対応
+        
+        // インジケーター生成
+        for (let i = 0; i < totalCards; i++) {
+            const indicator = document.createElement('div');
+            indicator.classList.add('indicator');
+            indicator.onclick = () => goToSlide(i);
+            indicatorsContainer.appendChild(indicator);
+        }
+        
+        const indicators = document.querySelectorAll('.indicator');
+        
+        function updateCarousel() {
+            cards.forEach((card, index) => {
+                // 現在の角度を計算
+                const angle = (index * angleStep + currentRotation) * (Math.PI / 180);
+                
+                // 円弧上の位置を計算
+                const x = Math.sin(angle) * radius;
+                const z = Math.cos(angle) * radius - radius;
+                
+                // Y軸回転（カードを中央に向ける）
+                const rotY = -index * angleStep - currentRotation;
+                
+                // 中央に近いカードほど大きく、手前に
+                const distanceFromCenter = Math.abs(z + radius);
+                const scale = Math.max(0.6, 1 - (distanceFromCenter / (radius * 2)) * 0.4);
+                const opacity = Math.max(0.4, 1 - (distanceFromCenter / (radius * 2)) * 0.6);
+                
+                // アクティブカードの判定（最も手前のカード）
+                const isActive = index === currentIndex;
+                
+                try {
+                    if (isActive) {
+                        card.classList.add('active');
+                        // アクティブカードは完全に正面を向く（rotateY: 0deg）
+                        card.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(0deg) translateZ(100px) scale(1.15)`;
+                        card.style.opacity = '1';
+                    } else {
+                        card.classList.remove('active');
+                        card.style.transform = `translateX(${x}px) translateZ(${z}px) rotateY(${rotY}deg) scale(${scale})`;
+                        card.style.opacity = opacity.toString();
+                    }
+                } catch (error) {
+                    console.log('Transform error:', error);
+                }
+            });
+            
+            // インジケーター更新
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentIndex);
+            });
+        }
+        
+        function rotateCarousel(direction) {
+            // 回転エフェクト
+            carousel.classList.add('rotating');
+            setTimeout(() => {
+                carousel.classList.remove('rotating');
+            }, 800);
+            
+            // インデックス更新
+            currentIndex += direction;
+            
+            if (currentIndex >= totalCards) {
+                currentIndex = 0;
+            } else if (currentIndex < 0) {
+                currentIndex = totalCards - 1;
+            }
+            
+            // 回転角度更新
+            currentRotation = -currentIndex * angleStep;
+            updateCarousel();
+        }
+        
+        function goToSlide(index) {
+            if (index === currentIndex) return;
+            
+            carousel.classList.add('rotating');
+            setTimeout(() => {
+                carousel.classList.remove('rotating');
+            }, 800);
+            
+            currentIndex = index;
+            currentRotation = -currentIndex * angleStep;
+            updateCarousel();
+        }
+        
+        // タッチ操作対応
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let lastMoveTime = 0;
+        
+        carousel.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            lastMoveTime = Date.now();
+        });
+        
+        carousel.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = Math.abs(currentX - startX);
+            const diffY = Math.abs(currentY - startY);
+            
+            // 横方向のスワイプのみ処理
+            if (diffX > diffY) {
+                e.preventDefault();
+            }
+        });
+        
+        carousel.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const diffX = startX - endX;
+            const timeDiff = Date.now() - lastMoveTime;
+            
+            // スワイプの判定
+            if (Math.abs(diffX) > 50 || (Math.abs(diffX) > 20 && timeDiff < 300)) {
+                if (diffX > 0) {
+                    rotateCarousel(1); // 左にスワイプ → 次へ（時計回り）
+                } else {
+                    rotateCarousel(-1); // 右にスワイプ → 前へ（反時計回り）
+                }
+            }
+            
+            isDragging = false;
+        });
+        
+        // マウスドラッグ対応
+        carousel.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isDragging = true;
+            lastMoveTime = Date.now();
+            e.preventDefault();
+        });
+        
+        carousel.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+        });
+        
+        carousel.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            
+            const endX = e.clientX;
+            const diffX = startX - endX;
+            const timeDiff = Date.now() - lastMoveTime;
+            
+            if (Math.abs(diffX) > 50 || (Math.abs(diffX) > 20 && timeDiff < 300)) {
+                if (diffX > 0) {
+                    rotateCarousel(1);
+                } else {
+                    rotateCarousel(-1);
+                }
+            }
+            
+            isDragging = false;
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+        
+        // キーボード操作
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                rotateCarousel(-1);
+            } else if (e.key === 'ArrowRight') {
+                rotateCarousel(1);
+            }
+        });
+        
+        // ホイール操作
+        carousel.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            if (Math.abs(e.deltaY) > 30) {
+                if (e.deltaY > 0) {
+                    rotateCarousel(1);
+                } else {
+                    rotateCarousel(-1);
+                }
+            }
+        }, { passive: false });
+        
+        // リサイズ時の更新
+        window.addEventListener('resize', () => {
+            radius = window.innerWidth <= 767 ? 300 : 400;
+            updateCarousel();
+        });
+        
+        // 自動回転（オプション）
+        let autoRotateInterval = null;
+        
+        function startAutoRotate() {
+            if (autoRotateInterval) {
+                clearInterval(autoRotateInterval);
+            }
+            autoRotateInterval = setInterval(() => {
+                rotateCarousel(1);
+            }, 4000);
+        }
+        
+        function stopAutoRotate() {
+            if (autoRotateInterval) {
+                clearInterval(autoRotateInterval);
+                autoRotateInterval = null;
+            }
+        }
+        
+        // マウスが入った時は自動回転停止
+        carousel.addEventListener('mouseenter', stopAutoRotate);
+        carousel.addEventListener('mouseleave', startAutoRotate);
+        
+        // 初期化
+        updateCarousel();
+        // startAutoRotate(); // 自動回転を有効にする場合はコメントアウト
+    </script>
+</body>
+</html>
