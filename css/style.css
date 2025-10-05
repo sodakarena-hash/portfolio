@@ -68,7 +68,8 @@ body {
 /* Hero Section */
 .hero-section {
     min-height: 100vh;
-    background: #ccc;
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                url('/pic/visual.png') center/cover no-repeat;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -76,43 +77,6 @@ body {
     text-align: center;
     position: relative;
     padding: 100px 20px 50px;
-}
-
-.hero-section::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3));
-    z-index: 2;
-}
-
-.hero-bg-desktop::after {
-    content: "1920 × 1080";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #999;
-    font-size: 48px;
-    font-family: Arial, sans-serif;
-    z-index: 1;
-    opacity: 0.5;
-}
-
-.hero-bg-mobile::after {
-    content: "768 × 1024";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #999;
-    font-size: 36px;
-    font-family: Arial, sans-serif;
-    z-index: 1;
-    opacity: 0.5;
 }
 
 .hero-subtitle {
@@ -238,30 +202,13 @@ body {
     width: 100%;
     height: 400px;
     border-radius: 8px;
-    background: #ccc;
-    position: relative;
+    overflow: hidden;
 }
 
-.about-bg-desktop::before {
-    content: "600 × 400";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    font-size: 24px;
-    font-family: Arial, sans-serif;
-}
-
-.about-bg-mobile::before {
-    content: "768 × 400";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    font-size: 24px;
-    font-family: Arial, sans-serif;
+.about-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Menu Section */
@@ -311,19 +258,13 @@ body {
 .menu-card-image {
     width: 100%;
     height: 200px;
-    background: #ccc;
-    position: relative;
+    overflow: hidden;
 }
 
-.menu-card-image::before {
-    content: "400 × 200";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    font-size: 18px;
-    font-family: Arial, sans-serif;
+.menu-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .menu-card-content {
@@ -456,34 +397,11 @@ body {
 
 /* News Section */
 .news-section {
-    background: linear-gradient(rgba(38,38,38,0.8), rgba(38,38,38,0.8)), #ccc;
+    background: linear-gradient(rgba(38,38,38,0.8), rgba(38,38,38,0.8)), 
+                url('/pic/news.png') center/cover no-repeat;
     padding: 80px 20px;
     color: white;
     position: relative;
-}
-
-.news-bg-desktop::before {
-    content: "1920 × 600";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    font-size: 36px;
-    font-family: Arial, sans-serif;
-    z-index: 1;
-}
-
-.news-bg-mobile::before {
-    content: "768 × 600";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    font-size: 24px;
-    font-family: Arial, sans-serif;
-    z-index: 1;
 }
 
 .news-container {
@@ -916,29 +834,17 @@ body {
 /* Responsive Design */
 @media (min-width: 768px) {
     .header {
-    background: #181818;
-    padding: 20px 0;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    transition: background 0.3s ease;
+        background: #181818;
+        padding: 20px 0;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        transition: background 0.3s ease;
     }
 
     .hero-section {
         background-attachment: fixed;
-    }
-
-    .hero-bg-mobile {
-        display: none;
-    }
-
-    .about-bg-mobile {
-        display: none;
-    }
-
-    .news-bg-mobile {
-        display: none;
     }
 
     .about-section {
@@ -967,25 +873,13 @@ body {
 
 @media (max-width: 767px) {
     .header {
-    background: #181818;
-    padding: 35px 0;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    transition: background 0.3s ease;
-    }
-
-    .hero-bg-desktop {
-        display: none;
-    }
-
-    .about-bg-desktop {
-        display: none;
-    }
-
-    .news-bg-desktop {
-        display: none;
+        background: #181818;
+        padding: 35px 0;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        transition: background 0.3s ease;
     }
 
     .nav-container {
@@ -1081,13 +975,13 @@ body {
 
 @media (max-width: 480px) {
     .header {
-    background: #181818;
-    padding: 35px 0;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    transition: background 0.3s ease;
+        background: #181818;
+        padding: 35px 0;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        transition: background 0.3s ease;
     }
 
     .nav-container {
