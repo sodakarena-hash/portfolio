@@ -69,7 +69,7 @@ body {
 .hero-section {
     min-height: 100vh;
     background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
-                url('../pic/visual.png') center/cover no-repeat;
+                url('pic/visual.png') center/cover no-repeat;
     display: flex;
     flex-direction: column;
     justify-content: center;
