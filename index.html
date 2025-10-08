@@ -1,40 +1,44 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>月明茶房 - GETUMEI CAFE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Literata:wght@400&family=Noticia+Text:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Literata:wght@400&family=Noticia+Text:wght@700&display=swap"
+        rel="stylesheet">
 
     <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/loader.css">
     <link rel="stylesheet" href="css/moon_3d.css">
-    
+
 </head>
+
 <body>
     <div class="moon-container" id="moonContainer"></div>
-    
+
     <!-- ローディングアニメーション -->
     <div id="moon-loading-overlay">
         <div class="moon-loading-container">
             <div class="moon-animation-area" id="moonAnimationArea">
             </div>
-            
+
             <div>
                 <h1 class="loading-title">月明茶房</h1>
                 <p class="loading-subtitle">GETUMEI CAFE</p>
-                
+
                 <div class="loading-progress">
                     <div class="progress-container">
                         <div class="progress-bar" id="progressBar"></div>
                     </div>
                     <div class="progress-text">
-                        <span class="loading-dots" id="loadingMessage">月明かりを集めています</span>
+                        <span class="loading-dots" id="loadingMessage"></span>
                         <span id="progressPercent">0%</span>
                     </div>
                 </div>
@@ -56,19 +60,21 @@
                     </div>
                 </nav>
             </header>
-            
+
             <section id="top" class="hero-section">
                 <div class="hero-subtitle">GETUMEI CAFE</div>
                 <h1 class="hero-title">月明茶房</h1>
                 <div class="hero-lines"></div>
-                <a href="#reserve" class="reservation-btn">reservation</a>
+                <a href="#reserve" class="reservation-btn">ご予約はこちら</a>
             </section>
-            
+
             <div class="topic-banner">
                 TOPIC｜8/11～8/15　夏季休業のお知らせ
-                <span class="view-more">view more</span>
+                <span class="view-more">
+                    <a href="#news">view more —</a>
+                </span>
             </div>
-            
+
             <section class="about-section fade-in">
                 <div class="about-content">
                     <h2 class="about-title">
@@ -84,11 +90,11 @@
                     <img src="pic/concept.png" alt="concept">
                 </div>
             </section>
-            
+
             <section id="menu" class="menu-section">
                 <h2 class="section-title">MENU</h2>
                 <div class="section-line"></div>
-                
+
                 <div class="menu-grid">
                     <div class="menu-card fade-in" data-menu="morning">
                         <div class="menu-card-image">
@@ -100,7 +106,7 @@
                             <p class="menu-card-time">10:00~</p>
                         </div>
                     </div>
-                    
+
                     <div class="menu-card fade-in" data-menu="lunch">
                         <div class="menu-card-image">
                             <img src="pic/lunch.png" alt="lunch">
@@ -111,7 +117,7 @@
                             <p class="menu-card-time">12:00~</p>
                         </div>
                     </div>
-                    
+
                     <div class="menu-card fade-in" data-menu="dinner">
                         <div class="menu-card-image">
                             <img src="pic/dinner.png" alt="dinner">
@@ -124,13 +130,13 @@
                     </div>
                 </div>
             </section>
-            
+
             <section id="news" class="news-section">
                 <div class="news-container">
                     <h2 class="news-title">NEWS</h2>
                     <div class="news-line"></div>
                     <p class="news-description">月明茶房からの最新情報やイベントのご案内をお届けいたします。</p>
-                    
+
                     <div class="news-grid">
                         <article class="news-item fade-in">
                             <div class="news-item-header">
@@ -139,7 +145,7 @@
                             </div>
                             <p class="news-item-content">秋の夜長にぴったりな、まろやかな味わいの月見ラテが新登場。特製のフォームアートでお楽しみください。</p>
                         </article>
-                        
+
                         <article class="news-item fade-in">
                             <div class="news-item-header">
                                 <h3 class="news-item-title">営業時間変更のお知らせ</h3>
@@ -147,7 +153,7 @@
                             </div>
                             <p class="news-item-content">1月20日より、平日の営業時間を9:00-22:00に変更いたします。より長くお楽しみいただけます。</p>
                         </article>
-                        
+
                         <article class="news-item fade-in">
                             <div class="news-item-header">
                                 <h3 class="news-item-title">ジャズライブイベント開催</h3>
@@ -155,7 +161,7 @@
                             </div>
                             <p class="news-item-content">毎月第3金曜日にジャズライブを開催。心地よい音楽と共に、特別な夜をお過ごしください。</p>
                         </article>
-                        
+
                         <article class="news-item fade-in">
                             <div class="news-item-header">
                                 <h3 class="news-item-title">年末年始営業のご案内</h3>
@@ -166,7 +172,7 @@
                     </div>
                 </div>
             </section>
-            
+
             <section id="reserve" class="reserve-section">
                 <div class="reserve-container">
                     <h2 class="reserve-title">RESERVE</h2>
@@ -175,7 +181,7 @@
                         事前のご予約で、お待たせることなく特別なお席をご用意いたします。<br>
                         静寂に包まれた空間で、心ゆくまでお寛ぎください。
                     </p>
-                    
+
                     <div class="reserve-content">
                         <div class="benefits-box fade-in">
                             <h3 class="benefits-title">ご予約の特典</h3>
@@ -196,31 +202,31 @@
                                 <span>アレルギー対応など事前のご相談が可能</span>
                             </div>
                         </div>
-                        
+
                         <form class="form-box fade-in">
                             <h3 class="form-title">予約フォーム</h3>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">お名前 *</label>
                                 <input type="text" class="form-input" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">メールアドレス *</label>
                                 <input type="email" class="form-input" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">電話番号</label>
                                 <input type="tel" class="form-input">
                             </div>
-                            
+
                             <div class="form-row">
                                 <div class="form-group">
                                     <label class="form-label">ご希望日 *</label>
                                     <input type="date" class="form-input" required>
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label class="form-label">ご希望時間 *</label>
                                     <select class="form-select" required>
@@ -239,7 +245,7 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group form-row full-width">
                                 <div>
                                     <label class="form-label">人数 *</label>
@@ -254,38 +260,38 @@
                                     </select>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label class="form-label">ご要望・備考</label>
                                 <textarea class="form-textarea" placeholder="アレルギーやその他のご要望があればお書きください"></textarea>
                             </div>
-                            
+
                             <button type="submit" class="form-submit">予約を送信する</button>
                         </form>
                     </div>
                 </div>
             </section>
-            
+
             <section id="info" class="info-section">
                 <div class="info-container">
                     <h2 class="info-title">INFO</h2>
                     <div class="info-line"></div>
                     <p class="info-description">月明茶房へのアクセス方法や営業時間など、ご来店に必要な情報をご案内いたします。</p>
-                    
+
                     <div class="info-content">
                         <div class="contact-box fade-in">
                             <h3 class="contact-title">お問い合わせ</h3>
-                            
+
                             <div class="contact-item">
                                 <span class="contact-label">電話番号</span>
                                 <p class="contact-info">03-1234-5678</p>
                             </div>
-                            
+
                             <div class="contact-item">
                                 <span class="contact-label">メールアドレス</span>
                                 <p class="contact-info">info@getumei-cafe.jp</p>
                             </div>
-                            
+
                             <div class="contact-item">
                                 <span class="contact-label">住所</span>
                                 <p class="contact-info">
@@ -294,7 +300,7 @@
                                     月明ビル1F
                                 </p>
                             </div>
-                            
+
                             <div class="contact-item">
                                 <span class="contact-label">営業時間</span>
                                 <p class="contact-info">
@@ -303,7 +309,7 @@
                                     定休日: 火曜日
                                 </p>
                             </div>
-                            
+
                             <div class="contact-item">
                                 <span class="contact-label">アクセス</span>
                                 <p class="contact-info">
@@ -313,12 +319,12 @@
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div id="map" class="info-map fade-in"></div>
                     </div>
                 </div>
             </section>
-            
+
             <footer class="footer">
                 <div class="footer-container">
                     <div class="footer-content">
@@ -329,34 +335,48 @@
                                 月明かりの下で、時を忘れる静謐な喫茶。日常の喧騒から離れた、あなただけの隠れ家で心ゆくまで安らぎのひとときをお過ごしください。
                             </p>
                         </div>
-                        
+
                         <div class="footer-right">
                             <div class="social-links">
-                                <a href="https://twitter.com/getumeicafe" target="_blank" class="social-link" aria-label="Twitter">
+                                <a href="https://twitter.com/getumeicafe" target="_blank" class="social-link"
+                                    aria-label="Twitter">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                        <path
+                                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                                     </svg>
                                 </a>
-                                <a href="https://www.instagram.com/getumeicafe/" target="_blank" class="social-link" aria-label="Instagram">
+                                <a href="https://www.instagram.com/getumeicafe/" target="_blank" class="social-link"
+                                    aria-label="Instagram">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                        <path
+                                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                                     </svg>
                                 </a>
-                                <a href="https://www.facebook.com/getumeicafe" target="_blank" class="social-link" aria-label="Facebook">
+                                <a href="https://www.facebook.com/getumeicafe" target="_blank" class="social-link"
+                                    aria-label="Facebook">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                        <path
+                                            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                                     </svg>
                                 </a>
                             </div>
                         </div>
                     </div>
-                    
+
+                    <button id="scrollTop" class="scroll-top-btn" aria-label="トップに戻る">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 19V5M12 5L5 12M12 5L19 12" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+
                     <div class="footer-bottom">
-                        <p>&copy; 2024 月明茶房 (GETUMEI CAFE). All rights reserved. | <a href="/privacy">プライバシーポリシー</a> | <a href="/terms">利用規約</a></p>
+                        <p>&copy; 2024 月明茶房 (GETUMEI CAFE). All rights reserved. | <a href="/privacy">プライバシーポリシー</a> |
+                            <a href="/terms">利用規約</a></p>
                     </div>
                 </div>
             </footer>
-            
+
             <div id="popup-overlay" class="popup-overlay">
                 <div class="popup-content">
                     <button class="popup-close">&times;</button>
@@ -365,18 +385,40 @@
             </div>
         </div>
     </div>
-    
+
+    <script>
+    const scrollTopBtn = document.getElementById('scrollTop');
+
+// スクロール時にボタンの表示/非表示を切り替え
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        scrollTopBtn.classList.add('show');
+    } else {
+        scrollTopBtn.classList.remove('show');
+    }
+});
+
+// クリックでトップへスムーズスクロール
+scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+</script>
+
     <!-- 重要: JSファイルの読み込み順序を修正 -->
     <!-- 1. まず3Dクラスを読み込み -->
     <script src="js/moon_3d.js"></script>
-    
+
     <!-- 2. メインスクリプトを読み込み -->
     <script src="js/script.js"></script>
-    
+
     <!-- 3. 外部API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
-    
+
     <!-- 4. 最後にローダーを読み込み（これがメインコンテンツを表示する） -->
     <script src="js/loader.js"></script>
 </body>
+
 </html>

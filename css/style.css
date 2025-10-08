@@ -144,9 +144,12 @@ body {
     font-size: clamp(16px, 2.5vw, 24px);
     font-family: 'Noto Serif JP', serif;
     font-weight: 600;
+    position: relative;
+    top: -80px;
+    text-align: right;
 }
 
-.view-more {
+.view-more a{
     color: white;
     text-decoration: underline;
     margin-left: 20px;
@@ -165,8 +168,9 @@ body {
 }
 
 .about-content {
+    position: relative;
     max-width: 600px;
-    top: -100;
+    top: -180px;
 }
 
 .about-title {
@@ -530,12 +534,15 @@ body {
     grid-template-columns: 1fr;
     gap: 40px;
     text-align: left;
+    grid-auto-rows: minmax(330px, auto);
 }
 
 .benefits-box {
     background: #F8F6F0;
     border-radius: 8px;
     padding: 40px 30px;
+  height: auto; /* ← 中のテキスト量に応じて自動調整 */
+  min-height: 330px; /* ← PCでは最低330px確保 */
 }
 
 .benefits-title {
@@ -832,6 +839,39 @@ body {
     text-decoration: underline;
 }
 
+/* スクロールボタン */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+.scroll-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-top-btn:hover {
+    background: #555;
+    transform: translateY(-3px);
+}
+
+
 /* Responsive Design */
 @media (min-width: 768px) {
     .header {
@@ -856,6 +896,7 @@ body {
     .reserve-content {
         grid-template-columns: 1fr 1fr;
         gap: 60px;
+        align-items: start;
     }
 
     .info-content {
@@ -870,9 +911,22 @@ body {
     .form-row.full-width {
         grid-template-columns: 1fr;
     }
+
+    .about-content {
+    position: relative;
+    max-width: 600px;
+    top: -80px;
+    }
+
+    .scroll-top-btn {
+    bottom: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767px) and (max-width: 1023px) {
     .header {
         background: #181818;
         padding: 35px 0;
@@ -972,6 +1026,12 @@ body {
     .footer-right {
         align-self: center;
     }
+
+    .about-content {
+    position: relative;
+    max-width: 600px;
+    top: 0px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1014,6 +1074,12 @@ body {
     .popup-content {
         padding: 25px 15px;
         margin: 5px;
+    }
+
+    .about-content {
+    position: relative;
+    max-width: 600px;
+    top: 0px;
     }
 }
 
