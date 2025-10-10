@@ -11,7 +11,7 @@
 }
 
 .project-hero-bg {
-  background: url('/cafe_detail/pic/hero.png') center/cover no-repeat;
+  background: url('pic/hero.png') center/cover no-repeat;
   position: absolute;
   inset: 0;
   z-index: 1;
