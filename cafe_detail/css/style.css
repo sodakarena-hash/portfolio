@@ -7,11 +7,15 @@ body {
 }
 
 a {
-  color: #d6baff;
+  /* color: #d6baff; */
   text-decoration: none;
 }
 
 header, footer {
   text-align: center;
   padding: 20px;
+}
+
+p {
+    font-family: 'Noto Serif JP', serif;
 }

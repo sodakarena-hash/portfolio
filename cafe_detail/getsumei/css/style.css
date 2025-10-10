@@ -92,7 +92,7 @@ body {
 
 .hero-title {
     color: white;
-    font-size: clamp(48px, 8vw, 96px);
+    font-size: clamp(48px, 4vw, 96px);
     font-family: 'Noto Serif JP', serif;
     font-weight: 700;
     letter-spacing: clamp(8px, 2vw, 15px);
@@ -105,7 +105,7 @@ body {
 .hero-lines {
     width: 100%;
     max-width: 500px;
-    height: 3px;
+    height: 2px;
     background: white;
     margin: 20px 0;
     z-index: 100;
@@ -117,7 +117,7 @@ body {
     color: white;
     border: 3px solid white;
     padding: 15px 40px;
-    font-size: clamp(18px, 3vw, 24px);
+    font-size: clamp(18px, 1vw, 24px);
     font-family: 'Noticia Text', serif;
     font-weight: 700;
     letter-spacing: 3px;
@@ -141,11 +141,11 @@ body {
     color: white;
     padding: 20px;
     text-align: center;
-    font-size: clamp(16px, 2.5vw, 24px);
+    font-size: clamp(16px, 1vw, 24px);
     font-family: 'Noto Serif JP', serif;
     font-weight: 600;
     position: relative;
-    top: -80px;
+    top: -65px;
     text-align: right;
 }
 
@@ -174,7 +174,7 @@ body {
 }
 
 .about-title {
-    font-size: clamp(24px, 4vw, 36px);
+    font-size: clamp(24px, 1vw, 36px);
     font-family: 'Noto Serif JP', serif;
     font-weight: 600;
     color: black;
@@ -183,7 +183,7 @@ body {
 }
 
 .about-title-large {
-    font-size: clamp(32px, 5vw, 48px);
+    font-size: clamp(32px, 2vw, 48px);
     display: block;
     margin-top: 10px;
 }
@@ -196,7 +196,7 @@ body {
 }
 
 .about-description {
-    font-size: clamp(16px, 2.5vw, 20px);
+    font-size: clamp(16px, 2.5vw, 10px);
     font-family: 'Noto Serif JP', serif;
     font-weight: 600;
     color: black;
@@ -1081,6 +1081,11 @@ body {
     max-width: 600px;
     top: 0px;
     }
+
+    .topic-banner {
+        top: -93px;
+    }
+
 }
 
 /* Animation Classes */
