@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Detail | Moon Café</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/project-detail.css" />
+
+  <link rel="stylesheet" href="css/animation-showcase.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="nav-container">
+      <nav class="nav-items">
+        <!-- <a href="index.html" class="nav-menu">Home</a>
+        <a href="#" class="nav-menu">About</a>
+        <a href="#" class="nav-menu">Menu</a>
+        <a href="#" class="nav-menu">Contact</a> -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="project-hero">
+    <div class="project-hero-bg"></div>
+    <div class="project-hero-content">
+      <h1 class="project-title">月明茶房</h1>
+      <p class="project-subtitle">静寂と温もりを感じるデザイン</p>
+      <button class="btn-slide-right">
+        <span>サイトはこちら</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Overview -->
+  <section class="project-overview fade-in">
+    <div class="overview-container">
+      <div class="overview-info">
+        <h2 class="overview-heading">概要</h2>
+        <p class="overview-text">
+          「月明かりの下、時を忘れる静謐な喫茶。」をテーマに、<br class="pc-only">
+          コンセプト設計からコーディングまでを担当しました。<br>
+          暖かい色味と陰影を感じるデザインを意識しました。
+        </p>
+
+        <ul class="overview-meta">
+          <li><strong>制作期間：</strong> 3週間</li>
+          <li><strong>使用ツール：</strong> Figma / Photoshop / Illustrator / HTML / CSS / JavaScript</li>
+          <li><strong>担当範囲：</strong> デザイン / コーディング / コンセプト設計</li>
+        </ul>
+      </div>
+
+      <div class="overview-image">
+        <div class="image-wrapper" id="imageWrapper">
+          <img src="pic/wf.png" alt="ワイヤーフレーム">
+        </div>
+              <p class="overview-text-cap">
+          ワイヤーフレーム
+        </p>
+      </div>
+
+
+      <!-- モーダル -->
+      <div class="modal" id="modal">
+        <button class="close-btn" id="closeBtn">×</button>
+        <div class="modal-content" id="modalContent">
+          <img class="modal-image" id="modalImage" src="pic/wf.png" alt="風景">
+        </div>
+        <div class="controls">
+          <button class="control-btn" id="zoomOut">−</button>
+          <div class="zoom-level" id="zoomLevel">100%</div>
+          <button class="control-btn" id="zoomIn">+</button>
+          <button class="control-btn" id="resetZoom">↺</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Gallery -->
+  <section class="project-gallery fade-in">
+    <div class="overview-container">
+      <div class="overview-image">
+        <div class="image-wrapper" id="imageWrapper">
+          <img src="pic/wf.png" alt="デザインカンプ">
+        </div>
+              <p class="overview-text-cap">
+          デザインカンプ
+        </p>
+      </div>
+
+      <div class="overview-info">
+        <h2 class="overview-heading">デザインコンセプト</h2>
+        <p class="overview-text">
+          月明かりを想起させる柔らかいトーンと、黒を基調とした静寂感を融合。<br>
+          カフェの時間がゆっくり流れるように、スクロールやホバーの動きも控えめにデザインしました。<br class="pc-only">
+        </p>
+
+        <ul class="overview-meta">
+          <li><strong>制作期間：</strong> 3週間</li>
+          <li><strong>使用ツール：</strong> Figma / Photoshop / Illustrator / HTML / CSS / JavaScript</li>
+          <li><strong>担当範囲：</strong> デザイン / コーディング / コンセプト設計</li>
+        </ul>
+      </div>
+
+      <!-- モーダル -->
+      <div class="modal" id="modal">
+        <button class="close-btn" id="closeBtn">×</button>
+        <div class="modal-content" id="modalContent">
+          <img class="modal-image" id="modalImage" src="pic/wf.png" alt="風景">
+        </div>
+        <div class="controls">
+          <button class="control-btn" id="zoomOut">−</button>
+          <div class="zoom-level" id="zoomLevel">100%</div>
+          <button class="control-btn" id="zoomIn">+</button>
+          <button class="control-btn" id="resetZoom">↺</button>
+        </div>
+      </div>
+    </div>
+    <!-- <h2 class="gallery-title">メインビジュアル</h2>
+    <div class="gallery-grid">
+      <div class="gallery-item"></div>
+      <div class="gallery-item"></div>
+      <div class="gallery-item"></div>
+    </div> -->
+  </section>
+
+  <!-- Concept -->
+  <section class="project-concept fade-in">
+    <h2 class="concept-title">学習</h2>
+    <p class="concept-text">
+      ローディングアニメーションとThree.jsを使用したスクロール連動式3Dオブジェクトを取り入れました。
+    </p>
+   <!-- 2カラムアニメーションエリア -->
+  <div class="animation-showcase">
+    <!-- 左カラム: ローディングアニメーション -->
+    <div class="showcase-item">
+      <div class="showcase-card loading-card">
+        <div id="demo-moon-loading" class="demo-loading-area">
+          <div class="demo-loading-container">
+            <div id="demoMoonAnimationArea" class="demo-moon-animation"></div>
+            
+            <!-- プログレスバー -->
+            <div class="demo-loading-progress">
+              <div class="demo-progress-container">
+                <div class="demo-progress-bar" id="demoProgressBar"></div>
+              </div>
+              <div class="demo-progress-text">
+                <span id="demoProgressPercent">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h3 class="showcase-title">ローディングアニメーション</h3>
+      <p class="showcase-description">月が集まり一つになる演出（6秒間）</p>
+    </div>
+    
+    <!-- 右カラム: 3D月オブジェクト -->
+    <div class="showcase-item">
+      <div class="showcase-card">
+        <div id="demo-moon-3d" class="demo-3d-container">
+          <div id="demoMoonContainer"></div>
+        </div>
+      </div>
+      <h3 class="showcase-title">スクロール連動3D</h3>
+      <p class="showcase-description">スクロールで回転する線画の月</p>
+    </div>
+  </div>
+  </section>
+
+  <!-- Reflection -->
+  <section class="project-reflection fade-in">
+    <h2 class="reflection-title">学び・工夫点</h2>
+    <ul class="reflection-list">
+      <li>配色とタイポグラフィの統一でブランドトーンを確立</li>
+      <li>モバイルでの視認性を意識し、余白と行間を再設計</li>
+      <li>ナビゲーションや予約導線のシンプル化</li>
+    </ul>
+  </section>
+
+  <!-- Back Link -->
+  <section class="project-back fade-in">
+    <a href="index.html" class="back-btn">← Back to Works</a>
+  </section>
+
+  <!-- Floating Banner -->
+  <div class="floating-banner" id="floatingBanner">
+    <button class="banner-close" id="bannerClose" aria-label="Close banner">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <path d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z">
+        </path>
+      </svg>
+    </button>
+    <a href="#" class="banner-link">
+      <img src="pic/bnr.png" alt="Special Offer" class="banner-image" />
+    </a>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <p>© 2025 Moon Café Portfolio</p>
+    </div>
+  </footer>
+
+  <script>
+    // Floating Banner Close Function
+    const floatingBanner = document.getElementById('floatingBanner');
+    const bannerClose = document.getElementById('bannerClose');
+
+    bannerClose.addEventListener('click', function (e) {
+      e.preventDefault();
+      floatingBanner.style.animation = 'slideOut 0.3s ease-out forwards';
+      setTimeout(() => {
+        floatingBanner.style.display = 'none';
+      }, 300);
+    });
+
+    const imageWrapper = document.getElementById('imageWrapper');
+    const modal = document.getElementById('modal');
+    const modalImage = document.getElementById('modalImage');
+    const closeBtn = document.getElementById('closeBtn');
+    const zoomInBtn = document.getElementById('zoomIn');
+    const zoomOutBtn = document.getElementById('zoomOut');
+    const resetZoomBtn = document.getElementById('resetZoom');
+    const zoomLevelDisplay = document.getElementById('zoomLevel');
+    const modalContent = document.getElementById('modalContent');
+
+    let scale = 1;
+    let translateX = 0;
+    let translateY = 0;
+    let isDragging = false;
+    let startX, startY;
+    let initialDistance = 0;
+    let initialScale = 1;
+
+    // 画像クリックでモーダル表示
+    imageWrapper.addEventListener('click', () => {
+      modal.classList.add('active');
+      resetTransform();
+    });
+
+    // 閉じる
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || e.target === modalContent) {
+        closeModal();
+      }
+    });
+
+    function closeModal() {
+      modal.classList.remove('active');
+      resetTransform();
+    }
+
+    // 変換を更新
+    function updateTransform() {
+      modalImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+      zoomLevelDisplay.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    function resetTransform() {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      updateTransform();
+    }
+
+    // ズームボタン
+    zoomInBtn.addEventListener('click', () => {
+      scale = Math.min(scale + 0.25, 5);
+      updateTransform();
+    });
+
+    zoomOutBtn.addEventListener('click', () => {
+      scale = Math.max(scale - 0.25, 0.5);
+      updateTransform();
+    });
+
+    resetZoomBtn.addEventListener('click', resetTransform);
+
+    // マウスホイールでズーム
+    modalContent.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      scale = Math.min(Math.max(scale + delta, 0.5), 5);
+      updateTransform();
+    });
+
+    // ドラッグで移動
+    modalImage.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', endDrag);
+
+    function startDrag(e) {
+      if (scale > 1) {
+        isDragging = true;
+        modalImage.classList.add('dragging');
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+      }
+    }
+
+    function drag(e) {
+      if (isDragging) {
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        updateTransform();
+      }
+    }
+
+    function endDrag() {
+      isDragging = false;
+      modalImage.classList.remove('dragging');
+    }
+
+    // タッチイベント（ピンチズーム）
+    let touches = [];
+
+    modalContent.addEventListener('touchstart', (e) => {
+      touches = Array.from(e.touches);
+
+      if (touches.length === 2) {
+        initialDistance = getDistance(touches[0], touches[1]);
+        initialScale = scale;
+      } else if (touches.length === 1 && scale > 1) {
+        isDragging = true;
+        startX = touches[0].clientX - translateX;
+        startY = touches[0].clientY - translateY;
+      }
+    });
+
+    modalContent.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      touches = Array.from(e.touches);
+
+      if (touches.length === 2) {
+        const currentDistance = getDistance(touches[0], touches[1]);
+        scale = Math.min(Math.max((currentDistance / initialDistance) * initialScale, 0.5), 5);
+        updateTransform();
+      } else if (touches.length === 1 && isDragging) {
+        translateX = touches[0].clientX - startX;
+        translateY = touches[0].clientY - startY;
+        updateTransform();
+      }
+    });
+
+    modalContent.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    function getDistance(touch1, touch2) {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    // ESCキーで閉じる
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
+
+    <script src="js/animation-showcase.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,322 @@
+/* ====================================
+   アニメーションショーケース
+   ==================================== */
+
+.animation-showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 60px auto 0;
+    padding: 0 20px;
+}
+
+.showcase-item {
+    text-align: center;
+}
+
+.showcase-card {
+    background: white;
+    border-radius: 16px;
+    padding: 0px 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    min-height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.showcase-card.loading-card {
+    padding: 0;
+    overflow: hidden;
+}
+
+.showcase-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.showcase-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 20px;
+    color: #2C1810;
+    margin: 25px 0 10px;
+    font-weight: 600;
+}
+
+.showcase-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* ====================================
+   デモ用ローディングアニメーション
+   ==================================== */
+
+.demo-loading-area {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 450px;
+    background: linear-gradient(135deg, #000000 0%, #181818 50%, #000000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.demo-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.demo-moon-animation {
+    position: relative;
+    width: 320px;
+    height: 160px;
+    margin: 0 auto;
+}
+
+/* 月のスタイル */
+.demo-moon-animation .moon {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: all 0.8s ease;
+    z-index: 1;
+}
+
+.demo-moon-animation .moon-shadow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25px;
+    height: 25px;
+    background: #000000;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+/* 月相 */
+.demo-moon-animation .moon.new-moon .moon-shadow { transform: translateX(-100%); }
+.demo-moon-animation .moon.thin-crescent .moon-shadow { transform: translateX(-75%); }
+.demo-moon-animation .moon.crescent .moon-shadow { transform: translateX(-50%); }
+.demo-moon-animation .moon.quarter .moon-shadow { transform: translateX(0%); }
+.demo-moon-animation .moon.waxing-gibbous .moon-shadow { transform: translateX(30%); }
+.demo-moon-animation .moon.gibbous .moon-shadow { transform: translateX(60%); }
+.demo-moon-animation .moon.full .moon-shadow { transform: translateX(100%); }
+
+/* アニメーション状態 */
+.demo-moon-animation .moon.moving {
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(205, 148, 105, 0.6);
+}
+
+.demo-moon-animation .moon.absorbed {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.1);
+}
+
+.demo-moon-animation .moon.enhanced {
+    box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.5),
+        0 0 30px rgba(205, 148, 105, 0.3);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* プログレスバー */
+.demo-loading-progress {
+    width: 100%;
+    max-width: 350px;
+}
+
+.demo-progress-container {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.demo-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, white, #CD9469, white);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.demo-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.demo-progress-text {
+    text-align: center;
+    color: white;
+    font-size: 15px;
+    margin-top: 12px;
+    letter-spacing: 2px;
+    font-weight: 300;
+    font-family: 'Noto Serif JP', serif;
+}
+
+/* ====================================
+   デモ用3D月（背景を白に変更）
+   ==================================== */
+
+.demo-3d-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 450px;
+    background: #FFFFFF; /* 白背景に変更 */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#demoMoonContainer {
+    width: 300px;
+    height: 300px;
+    pointer-events: none;
+}
+
+#demoMoonContainer canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+/* ====================================
+   レスポンシブ
+   ==================================== */
+
+@media (max-width: 768px) {
+    .animation-showcase {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .showcase-card {
+        padding: 30px 20px;
+        min-height: 400px;
+    }
+    
+    .demo-loading-area {
+        min-height: 400px;
+        padding: 30px 15px;
+    }
+    
+    .demo-loading-container {
+        gap: 40px;
+    }
+    
+    .demo-moon-animation {
+        width: 280px;
+        height: 140px;
+    }
+    
+    .demo-moon-animation .moon {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .demo-moon-animation .moon-shadow {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .demo-progress-text {
+        font-size: 14px;
+    }
+    
+    .demo-3d-container {
+        min-height: 400px;
+    }
+    
+    #demoMoonContainer {
+        width: 260px;
+        height: 260px;
+    }
+}
+
+@media (max-width: 480px) {
+    .animation-showcase {
+        gap: 30px;
+        margin-top: 40px;
+    }
+    
+    .showcase-card {
+        min-height: 350px;
+    }
+    
+    .demo-loading-area {
+        min-height: 350px;
+        padding: 25px 15px;
+    }
+    
+    .demo-loading-container {
+        gap: 35px;
+    }
+    
+    .demo-moon-animation {
+        width: 240px;
+        height: 120px;
+    }
+    
+    .demo-moon-animation .moon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .demo-moon-animation .moon-shadow {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .demo-loading-progress {
+        max-width: 280px;
+    }
+    
+    .demo-progress-text {
+        font-size: 13px;
+    }
+    
+    .demo-3d-container {
+        min-height: 350px;
+    }
+    
+    #demoMoonContainer {
+        width: 220px;
+        height: 220px;
+    }
+}
