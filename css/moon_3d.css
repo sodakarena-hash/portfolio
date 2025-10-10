@@ -1,0 +1,37 @@
+/* 3D月コンテナ（サイズを大きく調整） */
+.moon-container {
+    position: fixed;
+    top: 50%;
+    left: 30%; /* 左寄りに配置 */
+    transform: translate(-50%, -50%);
+    width: 450px; /* 350px → 450px に拡大 */
+    height: 450px; /* 350px → 450px に拡大 */
+    pointer-events: none;
+    z-index: -1; /* 完全に背景レイヤーに配置 */
+    mix-blend-mode: multiply;
+    opacity: 0.7; /* 少し濃く */
+}
+
+/* Canvas要素のスタイル */
+.moon-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+/* レスポンシブデザイン（3D関連） */
+@media (max-width: 767px) {
+    .moon-container {
+        width: 320px; /* 250px → 320px に拡大 */
+        height: 320px; /* 250px → 320px に拡大 */
+        left: 25%;
+    }
+}
+
+@media (max-width: 480px) {
+    .moon-container {
+        width: 280px;
+        height: 280px;
+        left: 20%;
+    }
+}
