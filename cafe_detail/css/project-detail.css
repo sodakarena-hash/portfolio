@@ -35,6 +35,32 @@
   letter-spacing: 3px;
 }
 
+/* 制作背景 */
+.project-background {
+  background: white;
+  padding: 100px 20px;
+  text-align: center;
+}
+
+.background-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.background-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 32px;
+  color: #2C1810;
+  margin-bottom: 30px;
+}
+
+.background-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.8;
+}
+
 /* Overview */
 .project-overview {
   background: #F8F6F0;
@@ -82,13 +108,36 @@
   list-style: none;
   font-size: 14px;
   color: #555;
-  line-height: 1.8;
+  line-height: 2;
+  padding-inline-start: 40px;
+}
+
+.overview-meta li {
+  margin-bottom: 8px;
+}
+
+.sub-list {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.sub-list li {
+  position: relative;
+  padding-left: 15px;
+  margin-bottom: 5px;
+}
+
+.sub-list li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: #CD9469;
 }
 
 .overview-image {
   width: 100%;
   height: 300px;
-  /* background: #ccc url('project-mockup.jpg') center/cover no-repeat; */
   border-radius: 8px;
 }
 
@@ -96,7 +145,6 @@
 .project-gallery {
   background: white;
   padding: 100px 20px;
-  /* text-align: center; */
 }
 
 .gallery-title {
@@ -119,6 +167,42 @@
   border-radius: 8px;
 }
 
+/* デザインポイント */
+.design-points {
+  margin-top: 30px;
+  padding: 25px;
+  background: #F8F6F0;
+  border-radius: 8px;
+}
+
+.points-subtitle {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 18px;
+  color: #2C1810;
+  margin-bottom: 15px;
+}
+
+.points-list {
+  list-style: none;
+  padding: 0;
+}
+
+.points-list li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.points-list li::before {
+  content: "◆";
+  color: #CD9469;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 /* Concept */
 .project-concept {
   background: #F5F3EE;
@@ -135,46 +219,64 @@
 
 .concept-text {
   max-width: 800px;
-  margin: 0 auto;
+  margin: 0 auto 60px;
   line-height: 1.8;
   font-size: 16px;
   color: #333;
   font-family: 'Noto Serif JP', serif;
 }
 
-/* Reflection */
-.project-reflection {
+/* 成果・学び */
+.project-result {
   background: white;
   padding: 100px 20px;
   text-align: center;
 }
 
-.reflection-title {
+.result-title {
+  font-family: 'Noto Serif JP', serif;
   font-size: 32px;
   color: #2C1810;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 }
 
-.reflection-list {
-  list-style: none;
-  max-width: 700px;
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
   margin: 0 auto;
-  font-size: 16px;
-  line-height: 2;
-  color: #333;
 }
 
-.reflection-list li {
-  position: relative;
-  padding-left: 20px;
+.result-item {
+  padding: 40px 30px;
+  background: #F8F6F0;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.reflection-list li::before {
-  content: "●";
-  color: #CD9469;
-  position: absolute;
-  left: 0;
-  top: 0;
+.result-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.result-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.result-subtitle {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  color: #2C1810;
+  margin-bottom: 15px;
+}
+
+.result-text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.8;
 }
 
 /* Back Button */
@@ -200,9 +302,7 @@
   color: #181818;
 }
 
-/* ================================
-   Floating Banner
-   ================================ */
+/* Floating Banner */
 .floating-banner {
   position: fixed;
   bottom: 20px;
@@ -264,199 +364,189 @@
 }
 
 /* ボタンデザイン */
-
-/* 左→右スライド */
 .btn-slide-right {
-    padding: 10px 35px;
-    border: 2px solid #000000;
-    background: white;
-    color: #000000;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    z-index: 1;
-    font-family: 'Noticia Text', serif;
+  padding: 10px 35px;
+  border: 2px solid #000000;
+  background: white;
+  color: #000000;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  z-index: 1;
+  font-family: 'Noticia Text', serif;
 }
 
 .btn-slide-right a {
-    color: inherit;  /* 親要素の色を継承 */
-    text-decoration: none;  /* 下線を消す */
-    position: relative;
-    z-index: 2;
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  z-index: 2;
 }
 
 .btn-slide-right span {
-    position: relative;
-    z-index: 2;
+  position: relative;
+  z-index: 2;
 }
 
 .btn-slide-right::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    transition: left 0.4s ease;
-    z-index: 0;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  transition: left 0.4s ease;
+  z-index: 0;
 }
 
 .btn-slide-right:hover::before {
-    left: 0;
+  left: 0;
 }
 
 .btn-slide-right:hover,
-.btn-slide-right:hover a {  /* aタグもホバー時に白に */
-    color: white;
+.btn-slide-right:hover a {
+  color: white;
 }
 
 .pc-only {
-    display: block;
+  display: block;
 }
 
-/* 画像ズームイン、ズームアウト */
+/* 画像ズーム */
+.image-wrapper {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  position: relative;
+  max-width: 600px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
- /* サムネイル画像 */
-        .image-wrapper {
-            width: 100%;
-            height: 300px;
-            overflow: hidden;
-            position: relative;
-            max-width: 600px;
-            cursor: pointer;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            /* top: -40px; */
-        }
-        
-        .image-wrapper:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-        
-        .image-wrapper img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        
-        /* モーダル */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .modal.active {
-            display: flex;
-            opacity: 1;
-        }
-        
-        .modal-content {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            touch-action: none;
-        }
-        
-        .modal-image {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-            cursor: grab;
-        }
-        
-        .modal-image.dragging {
-            cursor: grabbing;
-        }
-        
-        /* 閉じるボタン */
-        .close-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
-            border-radius: 50%;
-            color: white;
-            font-size: 30px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            z-index: 1001;
-        }
-        
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-        
-        /* コントロール */
-        .controls {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px 25px;
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
-            z-index: 1001;
-        }
-        
-        .control-btn {
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid white;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .zoom-level {
-            color: white;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            font-weight: 600;
-        }
+.image-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
 
+.image-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 
+/* モーダル */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.active {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.modal-image {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  cursor: grab;
+}
+
+.modal-image.dragging {
+  cursor: grabbing;
+}
+
+.close-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.controls {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 25px;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  z-index: 1001;
+}
+
+.control-btn {
+  width: 45px;
+  height: 45px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.zoom-level {
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-weight: 600;
+}
 
 /* Animations */
 @keyframes slideIn {
@@ -486,7 +576,11 @@
   .overview-container {
     grid-template-columns: 1fr;
     gap: 40px;
-    top: -30px;
+  }
+
+  .result-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
   }
 
   .floating-banner {
@@ -508,29 +602,28 @@
   }
 
   .overview-heading {
-  padding-inline-start: 0px;
-}
+    padding-inline-start: 0px;
+  }
 
-.overview-text {
-  padding-inline-start: 0px;
-}
+  .overview-text {
+    padding-inline-start: 0px;
+  }
 
-.overview-meta {
-  padding-inline-start: 0px;
-}
+  .overview-meta {
+    padding-inline-start: 0px;
+  }
 
-.pc-only {
-        display: block;
-    }
-
+  .pc-only {
+    display: block;
+  }
 }
 
 @media (max-width: 480px) {
-    .image-wrapper {
-      height: 250px;
+  .image-wrapper {
+    height: 250px;
   }
 
-    .overview-container {
+  .overview-container {
     grid-template-columns: 1fr;
     gap: 70px;
   }
@@ -541,19 +634,19 @@
     right: 10px;
   }
 
-    .overview-heading {
-  padding-inline-start: 0px;
-}
+  .overview-heading {
+    padding-inline-start: 0px;
+  }
 
-.overview-text {
-  padding-inline-start: 0px;
-}
+  .overview-text {
+    padding-inline-start: 0px;
+  }
 
-.overview-meta {
-  padding-inline-start: 0px;
-}
+  .overview-meta {
+    padding-inline-start: 0px;
+  }
 
-.pc-only {
+  .pc-only {
     display: none;
-}
+  }
 }

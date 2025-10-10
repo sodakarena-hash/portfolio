@@ -4,14 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- キャッシュ制御 -->
+  <!-- キャッシュ制御 -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Project Detail | Moon Café</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/project-detail.css" />
-
   <link rel="stylesheet" href="css/animation-showcase.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -20,12 +19,7 @@
   <!-- Header -->
   <header class="header">
     <div class="nav-container">
-      <nav class="nav-items">
-        <!-- <a href="index.html" class="nav-menu">Home</a>
-        <a href="#" class="nav-menu">About</a>
-        <a href="#" class="nav-menu">Menu</a>
-        <a href="#" class="nav-menu">Contact</a> -->
-      </nav>
+      <nav class="nav-items"></nav>
     </div>
   </header>
 
@@ -37,11 +31,21 @@
       <p class="project-subtitle">静寂と温もりを感じるデザイン</p>
       <button class="btn-slide-right">
         <span>
-          <a href="getsumei/index.html">
-            サイトはこちら
-          </a>
+          <a href="getsumei/index.html">サイトはこちら</a>
         </span>
       </button>
+    </div>
+  </section>
+
+  <!-- 制作背景 -->
+  <section class="project-background fade-in">
+    <div class="background-container">
+      <h2 class="background-title">制作背景</h2>
+      <p class="background-text">
+        「静寂な空間で、ゆっくりと時間を過ごす」というカフェのコンセプトを<br class="pc-only">
+        Webサイトでも体験できるよう、落ち着いた雰囲気とインタラクティブな演出を重視しました。<br>
+        訪問者が実際にカフェを訪れたかのような、心地よい体験を提供することを目指しました。
+      </p>
     </div>
   </section>
 
@@ -57,9 +61,17 @@
         </p>
 
         <ul class="overview-meta">
-          <li><strong>制作期間：</strong> 3週間</li>
-          <li><strong>使用ツール：</strong> Figma / Photoshop / Illustrator / HTML / CSS / JavaScript</li>
-          <li><strong>担当範囲：</strong> デザイン / コーディング / コンセプト設計</li>
+          <li><strong>役割：</strong>UI/UXデザイナー / フロントエンド開発者</li>
+          <li><strong>制作期間：</strong>3週間（企画1週間 / デザイン1週間 / 実装1週間）</li>
+          <li><strong>使用ツール：</strong>Figma / Photoshop / Illustrator / HTML / CSS / JavaScript / Three.js</li>
+          <li><strong>担当範囲：</strong>
+            <ul class="sub-list">
+              <li>コンセプト設計・ペルソナ設定</li>
+              <li>ワイヤーフレーム・デザインカンプ作成</li>
+              <li>HTML/CSS/JavaScriptでのコーディング</li>
+              <li>Three.jsを使った3D実装</li>
+            </ul>
+          </li>
         </ul>
       </div>
 
@@ -69,7 +81,7 @@
         </div>
         <p class="overview-text-cap">ワイヤーフレーム</p>
       </div>
-
+    </div>
   </section>
 
   <!-- Visual Gallery -->
@@ -86,31 +98,30 @@
         <h2 class="overview-heading">デザインコンセプト</h2>
         <p class="overview-text">
           月明かりを想起させる柔らかいトーンと、黒を基調とした静寂感を融合。<br>
-          カフェの時間がゆっくり流れるように、スクロールやホバーの動きも控えめにデザインしました。<br class="pc-only">
+          カフェの時間がゆっくり流れるように、スクロールやホバーの動きも控えめにデザインしました。
         </p>
 
-        <ul class="overview-meta">
-          <li><strong>制作期間：</strong> 3週間</li>
-          <li><strong>使用ツール：</strong> Figma / Photoshop / Illustrator / HTML / CSS / JavaScript</li>
-          <li><strong>担当範囲：</strong> デザイン / コーディング / コンセプト設計</li>
-        </ul>
+        <div class="design-points">
+          <h3 class="points-subtitle">デザインのポイント</h3>
+          <ul class="points-list">
+            <li><strong>配色：</strong>月明かりを連想させる温かみのあるベージュと、夜の静けさを表現する黒を基調</li>
+            <li><strong>タイポグラフィ：</strong>和風の雰囲気を演出する明朝体を使用</li>
+            <li><strong>アニメーション：</strong>ゆったりとした時間の流れを表現する控えめな動き</li>
+          </ul>
+        </div>
       </div>
-
-      <!-- <h2 class="gallery-title">メインビジュアル</h2>
-    <div class="gallery-grid">
-      <div class="gallery-item"></div>
-      <div class="gallery-item"></div>
-      <div class="gallery-item"></div>
-    </div> -->
+    </div>
   </section>
 
-  <!-- Concept -->
+  <!-- 学習 -->
   <section class="project-concept fade-in">
-    <h2 class="concept-title">学習</h2>
+    <h2 class="concept-title">技術実装</h2>
     <p class="concept-text">
-      ローディングアニメーションとThree.jsを使用したスクロール連動式3Dオブジェクトを取り入れました。
+      ローディングアニメーションとThree.jsを使用したスクロール連動式3Dオブジェクトを取り入れました。<br>
+      ユーザー体験を損なわないよう、パフォーマンスとビジュアルのバランスを重視しました。
     </p>
-    <!-- 2カラムアニメーションエリア -->
+
+    <!-- 2カラム アニメーションエリア -->
     <div class="animation-showcase">
       <!-- 左カラム: ローディングアニメーション -->
       <div class="showcase-item">
@@ -118,8 +129,6 @@
           <div id="demo-moon-loading" class="demo-loading-area">
             <div class="demo-loading-container">
               <div id="demoMoonAnimationArea" class="demo-moon-animation"></div>
-
-              <!-- プログレスバー -->
               <div class="demo-loading-progress">
                 <div class="demo-progress-container">
                   <div class="demo-progress-bar" id="demoProgressBar"></div>
@@ -148,15 +157,27 @@
     </div>
   </section>
 
-  <!-- Reflection -->
-  <!-- <section class="project-reflection fade-in">
-    <h2 class="reflection-title">学び・工夫点</h2>
-    <ul class="reflection-list">
-      <li>配色とタイポグラフィの統一でブランドトーンを確立</li>
-      <li>モバイルでの視認性を意識し、余白と行間を再設計</li>
-      <li>ナビゲーションや予約導線のシンプル化</li>
-    </ul>
-  </section> -->
+  <!-- 成果・学び -->
+  <section class="project-result fade-in">
+    <h2 class="result-title">成果・学び</h2>
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-icon">💻</div>
+        <h3 class="result-subtitle">技術面</h3>
+        <p class="result-text">Three.jsを使った3D表現とスクロール連動を実装し、ユーザー体験を向上させました。</p>
+      </div>
+      <div class="result-item">
+        <div class="result-icon">🎨</div>
+        <h3 class="result-subtitle">デザイン面</h3>
+        <p class="result-text">ブランドの世界観を一貫して表現し、訪問者に静寂な時間を提供できました。</p>
+      </div>
+      <div class="result-item">
+        <div class="result-icon">📈</div>
+        <h3 class="result-subtitle">今後の課題</h3>
+        <p class="result-text">ローディング時間の最適化とアクセシビリティの更なる向上が今後の改善点です。</p>
+      </div>
+    </div>
+  </section>
 
   <!-- Back Link -->
   <section class="project-back fade-in">
@@ -168,8 +189,7 @@
     <button class="banner-close" id="bannerClose" aria-label="Close banner">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path d="M0 0h24v24H0z" fill="none"></path>
-        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z">
-        </path>
+        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
       </svg>
     </button>
     <a href="#" class="banner-link">
@@ -196,8 +216,6 @@
       <p>© 2025 Moon Café Portfolio</p>
     </div>
   </footer>
-
-
 
   <script src="js/script.js"></script>
   <script src="js/animation-showcase.js"></script>

@@ -1,4 +1,4 @@
-    // Floating Banner Close Function
+// Floating Banner
     const floatingBanner = document.getElementById('floatingBanner');
     const bannerClose = document.getElementById('bannerClose');
 
@@ -10,8 +10,8 @@
       }, 300);
     });
 
-    // ★ ここを修正 ★
-    const imageWrappers = document.querySelectorAll('.image-wrapper'); // 全ての画像を取得
+    // Modal
+    const imageWrappers = document.querySelectorAll('.image-wrapper');
     const modal = document.getElementById('modal');
     const modalImage = document.getElementById('modalImage');
     const closeBtn = document.getElementById('closeBtn');
@@ -29,7 +29,6 @@
     let initialDistance = 0;
     let initialScale = 1;
 
-    // ★ 各画像にクリックイベントを追加 ★
     imageWrappers.forEach(wrapper => {
       wrapper.addEventListener('click', () => {
         const imageSrc = wrapper.getAttribute('data-image');
@@ -39,7 +38,6 @@
       });
     });
 
-    // 閉じる
     closeBtn.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {
       if (e.target === modal || e.target === modalContent) {
@@ -52,7 +50,6 @@
       resetTransform();
     }
 
-    // 変換を更新
     function updateTransform() {
       modalImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
       zoomLevelDisplay.textContent = `${Math.round(scale * 100)}%`;
@@ -65,7 +62,6 @@
       updateTransform();
     }
 
-    // ズームボタン
     zoomInBtn.addEventListener('click', () => {
       scale = Math.min(scale + 0.25, 5);
       updateTransform();
@@ -78,7 +74,6 @@
 
     resetZoomBtn.addEventListener('click', resetTransform);
 
-    // マウスホイールでズーム
     modalContent.addEventListener('wheel', (e) => {
       e.preventDefault();
       const delta = e.deltaY > 0 ? -0.1 : 0.1;
@@ -86,7 +81,6 @@
       updateTransform();
     });
 
-    // ドラッグで移動
     modalImage.addEventListener('mousedown', startDrag);
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', endDrag);
@@ -113,12 +107,10 @@
       modalImage.classList.remove('dragging');
     }
 
-    // タッチイベント(ピンチズーム)
     let touches = [];
 
     modalContent.addEventListener('touchstart', (e) => {
       touches = Array.from(e.touches);
-
       if (touches.length === 2) {
         initialDistance = getDistance(touches[0], touches[1]);
         initialScale = scale;
@@ -132,7 +124,6 @@
     modalContent.addEventListener('touchmove', (e) => {
       e.preventDefault();
       touches = Array.from(e.touches);
-
       if (touches.length === 2) {
         const currentDistance = getDistance(touches[0], touches[1]);
         scale = Math.min(Math.max((currentDistance / initialDistance) * initialScale, 0.5), 5);
@@ -154,7 +145,6 @@
       return Math.sqrt(dx * dx + dy * dy);
     }
 
-    // ESCキーで閉じる
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeModal();
