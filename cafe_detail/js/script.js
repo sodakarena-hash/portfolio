@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, observerOptions);
 
-  // すべてのフェードイン要素を監視
-  const fadeElements = document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .fade-in-scale');
+  // .fade-in クラスを持つすべての要素を監視
+  const fadeElements = document.querySelectorAll('.fade-in');
   fadeElements.forEach(el => fadeInObserver.observe(el));
 });
 
