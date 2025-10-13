@@ -956,7 +956,8 @@ body {
         align-items: center;
         flex-wrap: wrap;
         gap: 20px;
-        padding: 20px 20px 20px 70px;
+        padding: 20px;
+        /* padding: 20px 20px 20px 70px; */
         transition: top 0.4s ease;
         z-index: 999;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -979,7 +980,7 @@ body {
     .mobile-menu-toggle {
         display: block;
         position: fixed;
-        left: 20px;
+        right: 20px;
         top: 20px;
         z-index: 1010;
         width: 24px;

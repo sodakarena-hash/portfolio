@@ -404,22 +404,14 @@ nav a.active::after {
 }
 
 .pdf-image {
-    /* width: 100%;
-    height: 300px;
-    position: relative;
-    max-width: 600px;
-    cursor: pointer;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s; */
     width: 100%;
     height: auto;
     display: block;
 }
 
 .btn {
-  position: relative;              /* ← 必須！::beforeの基準にする */
-  display: inline-block;           /* インライン要素に幅と高さを持たせる */
+  position: relative;
+  display: inline-block;
   color: #C69C6D;
   text-decoration: none;
   border: 2px solid #C69C6D;
@@ -428,8 +420,8 @@ nav a.active::after {
   font-weight: 700;
   letter-spacing: 2px;
   border-radius: 40px;
-  overflow: hidden;                /* ← スライド背景がはみ出さないようにする */
-  transition: color 0.3s ease;     /* 文字色の変化 */
+  overflow: hidden;
+  transition: color 0.3s ease;
   z-index: 1;
 }
 
@@ -437,20 +429,20 @@ nav a.active::after {
   content: '';
   position: absolute;
   top: 0;
-  left: -100%;                     /* 左から出てくる */
+  left: -100%;
   width: 100%;
   height: 100%;
-  background: #C69C6D;             /* ← 好きな背景色に変更 */
-  z-index: 0;                      /* 背景がテキストの下に来るように */
+  background: #C69C6D;
+  z-index: 0;
   transition: left 0.4s ease;
 }
 
 .btn:hover::before {
-  left: 0;                         /* 左からスライドしてくる */
+  left: 0;
 }
 
 .btn:hover {
-  color: #ffffff;                     /* 背景が出たあと文字を白に */
+  color: #ffffff;
 }
 
 .btn span {
@@ -568,22 +560,6 @@ nav a.active::after {
     filter: blur(2px);
 }
 
-
-
-/* .card-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    padding: 6px 14px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    border-radius: 20px;
-    z-index: 2;
-    font-family: 'Roboto', sans-serif;
-    background: #D4C4B0;
-    color: white;
-} */
-
 .card-image.design-only {
     background: linear-gradient(135deg, rgba(232, 222, 208, 0.2), rgba(232, 222, 208, 0.05));
 }
@@ -661,6 +637,117 @@ nav a.active::after {
     font-size: 0.9rem;
 }
 
+/* ===== トップに戻るボタン ===== */
+.scroll-to-top {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+}
+
+.scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* ===== トップに戻るボタン ===== */
+.scroll-to-top {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+}
+
+.scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-to-top-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 回転する円とダイヤの画像 */
+.rotating-circle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: rotate 8s linear infinite;
+    transform-origin: center 55%;
+}
+
+/* TOP↑ボタン */
+.top-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+    z-index: 3;
+}
+
+/* ↑矢印 */
+.arrow-up {
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    color: #C69C6D;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.top-text {
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #C69C6D;
+    letter-spacing: 1px;
+    margin-top: -2px;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.scroll-to-top:hover .rotating-circle {
+    animation: rotate 4s linear infinite;
+}
+
+.scroll-to-top:hover .arrow-up,
+.scroll-to-top:hover .top-text {
+    color: #B88A5D;
+}
+
 /* ===== レスポンシブ対応 ===== */
 
 /* タブレット・中型画面 (1200px以下) */
@@ -698,8 +785,8 @@ nav a.active::after {
     }
 
     .project-overview {
-    padding: 0px 0px;
-}
+        padding: 0px 0px;
+    }
 }
 
 /* タブレット (1010px以下) */
@@ -768,15 +855,30 @@ nav a.active::after {
     }
 
     .overview-container {
-      display: flex; 
+        display: flex; 
         flex-direction: column;
         align-items: center;
         gap: 30px;
-}
+    }
 
     .project-overview {
-    padding: 0px 0px;
-}
+        padding: 0px 0px;
+    }
+    
+    .scroll-to-top {
+        bottom: 30px;
+        right: 30px;
+        width: 70px;
+        height: 70px;
+    }
+    
+    .arrow-up {
+        font-size: 18px;
+    }
+    
+    .top-text {
+        font-size: 14px;
+    }
 }
 
 /* タブレット・スマートフォン (768px以下) */
@@ -810,7 +912,6 @@ nav a.active::after {
         font-size: 16px;
     }
     
-    /* プロフィール情報を中央寄せ */
     .info-block {
         text-align: center;
         display: flex;
@@ -822,7 +923,6 @@ nav a.active::after {
         text-align: center;
     }
     
-    /* ラベルの位置を中央寄せに合わせて調整 */
     .name-label {
         left: 45%;
         transform: translateX(-50%) rotate(-15deg);
@@ -929,15 +1029,15 @@ nav a.active::after {
     }
 
     .overview-container {
-      display: flex; 
+        display: flex; 
         flex-direction: column;
         align-items: center;
         gap: 30px;
-}
+    }
 
     .project-overview {
-    padding: 0px 0px;
-}
+        padding: 0px 0px;
+    }
 
     .card.coming-soon::before {
         font-size: 1.2rem;
@@ -1079,20 +1179,34 @@ nav a.active::after {
     }
 
     .overview-container {
-      display: flex; 
+        display: flex; 
         flex-direction: column;
         align-items: center;
         gap: 30px;
-}
+    }
 
     .project-overview {
-    padding: 0px 0px;
-}
-
+        padding: 0px 0px;
+    }
 
     .card.coming-soon::before {
         font-size: 1rem;
         padding: 12px 25px;
+    }
+    
+    .scroll-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+    }
+    
+    .arrow-up {
+        font-size: 17px;
+    }
+    
+    .top-text {
+        font-size: 13px;
     }
 }
 
@@ -1113,13 +1227,28 @@ nav a.active::after {
     }
 
     .overview-container {
-      display: flex; 
+        display: flex; 
         flex-direction: column;
         align-items: center;
         gap: 30px;
-}
+    }
 
     .project-overview {
-    padding: 0px 0px;
-}
+        padding: 0px 0px;
+    }
+    
+    .scroll-to-top {
+        bottom: 15px;
+        right: 15px;
+        width: 55px;
+        height: 55px;
+    }
+    
+    .arrow-up {
+        font-size: 16px;
+    }
+    
+    .top-text {
+        font-size: 12px;
+    }
 }

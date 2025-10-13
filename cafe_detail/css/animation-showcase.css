@@ -224,6 +224,7 @@
     .animation-showcase {
         grid-template-columns: 1fr;
         gap: 40px;
+        display: block;
     }
     
     .showcase-card {
@@ -273,6 +274,7 @@
     .animation-showcase {
         gap: 30px;
         margin-top: 40px;
+        display: block;
     }
     
     .showcase-card {
