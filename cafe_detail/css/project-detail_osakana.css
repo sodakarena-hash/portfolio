@@ -192,7 +192,7 @@
 }
 
 .points-subtitle {
-  font-family: 'Noto Serif JP', serif;
+  /* font-family: 'Noto Serif JP', serif; */
   font-size: 18px;
   color: #2C1810;
   margin-bottom: 15px;
@@ -446,7 +446,7 @@
 }
 
 .project-card-title {
-  /* font-family: 'Noto Serif JP', serif; */
+  font-family: 'Noto Serif JP', serif;
   font-size: 20px;
   color: #2C1810;
   margin-bottom: 15px;
@@ -454,7 +454,7 @@
 }
 
 .project-card-description {
-  /* font-family: 'Noto Serif JP', serif; */
+  font-family: 'Noto Serif JP', serif;
   font-size: 14px;
   color: #555;
   line-height: 1.8;
@@ -463,7 +463,7 @@
 
 .project-card-link {
   display: inline-block;
-  /* font-family: 'Noticia Text', serif; */
+  font-family: 'Noticia Text', serif;
   font-size: 14px;
   color: #CD9469;
   font-weight: 600;
